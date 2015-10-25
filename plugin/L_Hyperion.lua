@@ -121,12 +121,44 @@ function startup(lul_device)
    luup.call_timer("tick", 1, "30s", "", hyperion_id)
 end
 
+function do_dim(hyperion_id, target)
+   hyperion_util.dim_set(hyperion_id, target)
+   hyperion_ambience.update(hyperion_id)
+end
+
+function do_switch(hyperion_id, target)
+   local current_dim = hyperion_util.dim_get(hyperion_id)
+   if current_dim > 0 and target == "0" then
+      hyperion_util.cfg_set(hyperion_id, 'LastDim', current_dim)
+   end
+   local val = "0"
+   if target == "1" then
+      val = hyperion_util.cfg_get(hyperion_id, 'LastDim', "100")
+   end
+   local current_dim = hyperion_util.dim_get(hyperion_id)
+   hyperion_util.dim_set(hyperion_id, val)
+   ez_vera.switch_set(hyperion_util.get_child(hyperion_id, 'dimmer'), target)
+end
+
+function do_ambience(hyperion_id, target)
+   hyperion_util.cfg_set(hyperion_id, 'Ambience', target)
+   ez_vera.switch_set(hyperion_util.get_child(hyperion_id, 'ambience'), target)
+end
+
+function do_temp(hyperion_id, target)
+   local val = "3250"
+   if target == "1" then
+      val = "5000"
+   end
+   hyperion_util.cfg_set(hyperion_id, 'Preset', val)
+   ez_vera.switch_set(hyperion_util.get_child(hyperion_id, 'temp'), target)
+end
+
 function light_dim(lul_device, target)
    local device_id = tonumber(lul_device)
    local hyperion_id = hyperion_util.ensure_parent(device_id)
    if hyperion_util.get_child(hyperion_id, 'dimmer') == device_id then
-      hyperion_util.dim_set(hyperion_id, target)
-      hyperion_ambience.update(hyperion_id)
+      do_dim(hyperion_id, target)
       return true
    end
 end
@@ -136,29 +168,19 @@ function child_watch(lul_device, lul_service, lul_variable, lul_value_old, lul_v
    local hyperion_id = hyperion_util.ensure_parent(device_id)
    if hyperion_util.get_child(hyperion_id, 'dimmer') == device_id then
       if lul_service == "urn:upnp-org:serviceId:Dimming1" and lul_variable == "LoadLevelStatus"  then
-         hyperion_util.set_dim(hyperion_id, lul_value_new)
-      
+         do_dim(hyperion_id, lul_value_new)
       elseif lul_service == "urn:upnp-org:serviceId:SwitchPower1" and lul_variable == "Status" then
-         if lul_value_new == "0" then
-            hyperion_util.dim_set(hyperion_id, "0")
-         else
-            hyperion_util.dim_set(hyperion_id, "100")
-         end
+         do_switch(hyperion_id, lul_value_new)
       end
    elseif hyperion_util.get_child(hyperion_id, 'ambience') == device_id then
       if lul_service == "urn:upnp-org:serviceId:SwitchPower1" and lul_variable == "Status" then
-         hyperion_util.cfg_set(hyperion_id, "Ambience", luul_value_new)
+         do_ambience(hyperion_id, lul_value_new)
       end
    elseif hyperion_util.get_child(hyperion_id, 'temp') == device_id then
       if lul_service == "urn:upnp-org:serviceId:SwitchPower1" and lul_variable == "Status" then
-         local val = "3250"
-         if lul_value_new == "1" then
-            val = "5000"
-         end
-         hyperion_util.cfg_set(hyperion_id, "Preset", val)
+         do_temp(hyperion_id, lul_value_new)
       end
    end
-   hyperion_ambience.update(hyperion_id)
 end
 
 function light_switch(lul_device, target)
@@ -166,27 +188,11 @@ function light_switch(lul_device, target)
    local hyperion_id = hyperion_util.ensure_parent(lul_device)
    if device_id ~= hyperion_id then
       if hyperion_util.get_child(hyperion_id, 'ambience') == device_id then
-         hyperion_util.cfg_set(hyperion_id, 'Ambience', target)
-         ez_vera.switch_set(device_id, target)
+         do_ambience(hyperion_id, target)
       elseif hyperion_util.get_child(hyperion_id, 'dimmer') == device_id then
-         local current_dim = hyperion_util.dim_get(hyperion_id)
-         if current_dim > 0 and target == "0" then
-            hyperion_util.cfg_set(hyperion_id, 'LastDim', current_dim)
-         end
-         local val = "0"
-         if target == "1" then
-            val = hyperion_util.cfg_get(hyperion_id, 'LastDim', "100")
-         end
-         local current_dim = hyperion_util.dim_get(hyperion_id)
-         hyperion_util.dim_set(hyperion_id, val)
-         ez_vera.switch_set(device_id, target)
+         do_switch(hyperion_id, target)
       elseif hyperion_util.get_child(hyperion_id, 'temp') == device_id then
-         local val = "3250"
-         if target == "1" then
-            val = "5000"
-         end
-         hyperion_util.cfg_set(hyperion_id, 'Preset', val)
-         ez_vera.switch_set(device_id, target)
+         do_temp(hyperion_id, target)
       end
    else
       ez_vera.switch_set(hyperion_id, target)
