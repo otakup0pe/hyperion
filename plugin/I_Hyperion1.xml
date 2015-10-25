@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<implementation>
+  <files>L_Hyperion.lua</files>
+  <startup>startup</startup>
+  <actionList>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:Dimming1</serviceId>
+      <name>SetLoadLevelTarget</name>
+      <run>
+        return light_dim(lul_device, lul_settings.newLoadlevelTarget)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:upnp-org:serviceId:SwitchPower1</serviceId>
+      <name>SetTarget</name>
+      <run>
+        return light_switch(lul_device, lul_settings.newTargetValue)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>SetLogLevel</name>
+      <run>
+        return cfg_set(lul_device, 'LogLevel', lul_settings.Level)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>SetTemp</name>
+      <run>
+        return temp_set(lul_device, lul_settings.Name, lul_settings.Temp)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>SetAmbience</name>
+      <run>
+        return ambience_set(lul_device, lul_settings.Enabled)
+      </run>
+    </action>
+  </actionList>
+</implementation>

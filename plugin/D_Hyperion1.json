@@ -1,0 +1,264 @@
+{
+  "flashicon": "icons/Binary_Light.swf",
+  "imgIconBody": "",
+  "imgIconDimmable": "",
+  "imgIconTurnable": "",
+  "imgIconMin": "",
+  "imgIconMax": "",
+  "halloIconsDir": "pics/hallo",
+  "stateIcons": [],
+  "x": "2",
+  "y": "4",
+  "iconText": "0",
+  "inScene": "1",
+  "DisplayStatus": {},
+  "doc_url": {
+    "doc_language": 1,
+    "doc_manual": 1,
+    "doc_version": 1,
+    "doc_platform": 0,
+    "doc_page": "lighting_devices"
+  },
+  "ToggleButton": 1,
+  "Tabs": [
+    {
+      "Label": {
+        "lang_tag": "ui7_tabname_control",
+        "text": "Control"
+      },
+      "Position": "0",
+      "TabType": "flash",
+      "top_navigation_tab": 1,
+      "ControlGroup": [
+        {
+          "id": "1",
+          "isSingle": "1",
+          "scenegroup": "1"
+        }
+      ],
+      "SceneGroup": [
+        {
+          "id": "1",
+          "top": "0",
+          "left": "0",
+          "x": "2",
+          "y": "3"
+        }
+      ],
+      "Control": [
+        {
+          "ControlGroup": "1",
+          "ControlType": "multi_state_button",
+          "top": "1",
+          "left": "0",
+          "Display": {
+            "Top": "0",
+            "Left": "0",
+            "Width": "50",
+            "Height": "20"
+          },
+          "states":[
+            {
+              "Label": {
+                "lang_tag": "ui7_cmd_on",
+                "text": "On"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:upnp-org:serviceId:SwitchPower1",
+                "Variable": "Status",
+                "Value": "1"
+              },
+              "Command": {
+                "Service": "urn:upnp-org:serviceId:SwitchPower1",
+                "Action": "SetTarget",
+                "Parameters": [
+                  {
+                    "Name": "newTargetValue",
+                    "Value": "1"
+                  }
+                ]
+              },
+              "ControlCode": "power_on"
+            },
+            {
+              "Label": {
+                "lang_tag": "ui7_cmd_off",
+                "text": "Off"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:upnp-org:serviceId:SwitchPower1",
+                "Variable": "Status",
+                "Value": "0"
+              },
+              "Command": {
+                "Service": "urn:upnp-org:serviceId:SwitchPower1",
+                "Action": "SetTarget",
+                "Parameters": [
+                  {
+                    "Name": "newTargetValue",
+                    "Value": "0"
+                  }
+                ]
+              },
+              "ControlCode": "power_off"
+            }
+          ]
+        },
+        {
+          "ControlGroup": "1",
+          "ControlType": "multi_state_button",
+          "top": "2",
+          "left": "0",
+          "Display": {
+            "Top": "0",
+            "Left": "60",
+            "Width": "50",
+            "Height": "20"
+          },
+          "states":[
+            {
+              "Label": {
+                "lang_tag": "cmd_cold",
+                "text": "Cold"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "Preset",
+                "Value": "5000"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetTemp",
+                "Parameters": [
+                  {
+                    "Name": "Name",
+                    "Value": "Preset"
+                  },
+                  {
+                    "Name": "Temp",
+                    "Value": "5000"
+                  }
+                ]
+              },
+              "ControlCode": "cmd_cold"
+            },
+            {
+              "Label": {
+                "lang_tag": "cmd_warm",
+                "text": "Warm"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "Preset",
+                "Value": "3250"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetTemp",
+                "Parameters": [
+                  {
+                    "Name": "Name",
+                    "Value": "Preset"
+                  },
+                  {
+                    "Name": "Temp",
+                    "Value": "3250"
+                  }
+                ]
+              },
+              "ControlCode": "cmd_warm"
+            }
+          ]
+        },
+        {
+          "ControlGroup": "1",
+          "ControlType": "multi_state_button",
+          "top": "3",
+          "left": "0",
+          "Display": {
+            "Top": "0",
+            "Left": "120",
+            "Width": "50",
+            "Height": "20"
+          },
+          "states":[
+            {
+              "Label": {
+                "lang_tag": "cmd_ambience_on",
+                "text": "Ambience"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "Ambience",
+                "Value": "1"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetAmbience",
+                "Parameters": [
+                  {
+                    "Name": "Enabled",
+                    "Value": "1"
+                  }
+                ]
+              },
+              "ControlCode": "cmd_ambience"
+            },
+            {
+              "Label": {
+                "lang_tag": "cmd_preset",
+                "text": "Preset"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "Ambience",
+                "Value": "0"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetAmbience",
+                "Parameters": [
+                  {
+                    "Name": "Enabled",
+                    "Value": "0"
+                  }
+                ]
+              },
+              "ControlCode": "cmd_preset"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "Label": {
+        "lang_tag": "settings",
+        "text": "Settings"
+      },
+      "Position": "2",
+      "TabType": "javascript",
+      "ScriptName": "shared.js",
+      "Function": "simple_device"
+    },
+    {
+      "Label": {
+        "lang_tag": "advanced",
+        "text": "Advanced"
+      },
+      "Position": "6",
+      "TabType": "javascript",
+      "ScriptName": "shared.js",
+      "Function": "advanced_device"
+    }
+  ],
+  "sceneList": {},
+  "eventList2": [],
+  "DeviceType": "urn:schemas-otakup0pe:device:Hyperion:1",
+  "device_type": "urn:schemas-otakup0pe:device:Hyperion:1"
+}

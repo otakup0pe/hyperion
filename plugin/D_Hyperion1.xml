@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<root xmlns="urn:schemas-upnp-org:device-1-0">
+  <specVersion>
+    <major>1</major>
+    <minor>0</minor>
+  </specVersion>
+  <device>
+    <deviceType>urn:schemas-otakup0pe:device:Hyperion:1</deviceType>
+    <staticJson>D_Hyperion1.json</staticJson>
+    <handleChildren>1</handleChildren>
+    <serviceList>
+      <service>
+        <serviceType>urn:schemas-otakup0pe:service:Hyperion:1</serviceType>
+        <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+        <SCPDURL>S_Hyperion1.xml</SCPDURL>
+      </service>
+      <service>
+        <serviceType>urn:schemas-micasaverde-com:service:HaDevice:1</serviceType>
+        <serviceId>urn:micasaverde-com:serviceId:HaDevice1</serviceId>
+        <SCPDURL>S_HaDevice1.xml</SCPDURL>
+      </service>
+  </serviceList>
+  <implementationList>
+    <implementationFile>I_Hyperion1.xml</implementationFile>
+  </implementationList>
+</device>
+</root>
