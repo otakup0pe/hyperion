@@ -62,6 +62,7 @@ function tick(lul_device)
    local hyperion_id = tonumber(lul_device)
    log(hyperion_id, 'debug', "TICK")
    hyperion_ambience.update(hyperion_id)
+   luup.call_timer("tick", 1, "60", "", hyperion_id)
 end
 
 function ensure_children(hyperion_id)
@@ -118,7 +119,7 @@ function startup(lul_device)
    validate_device_list(hyperion_id, 'include_devices', '')
    ensure_children(hyperion_id)
    hyperion_ambience.update(hyperion_id)
-   luup.call_timer("tick", 1, "30s", "", hyperion_id)
+   luup.call_timer("tick", 1, "60", "", hyperion_id)
 end
 
 function do_dim(hyperion_id, target)
