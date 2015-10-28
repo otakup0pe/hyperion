@@ -13,8 +13,13 @@ function twilight_ambience(hyperion_id, device_id)
    local twilight = sunset - sunset_grace
    local twilight_remaining = sunset - now
    log(hyperion_id, "debug", "twilight dist " .. sunset_grace .. " remaining " .. twilight_remaining)
-   local twilight_percent = (twilight_remaining / sunset_grace) * 100
-   local dim = math.floor((twilight_percent/100) * hyperion_util.dim_get(hyperion_id))
+   local twilight_percent
+   if twilight_remaining <= sunset_grace then
+      twilight_percent = (twilight_remaining / sunset_grace) * 100
+   else
+      twilight_percent = 100
+   end
+   dim = math.floor((twilight_percent/100) * hyperion_util.dim_get(hyperion_id))
    ez_vera.dim_actuate(device_id, dim)
 end
 
