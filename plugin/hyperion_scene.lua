@@ -13,13 +13,15 @@ function dim_down(hyperion_id)
    end
    local child_id = hyperion_util.get_child(hyperion_id, 'dimmer')
    local current = ez_vera.dim_get(child_id)
+   local dim
    if current - 10 > 0 then
-      ez_vera.dim_actuate(child_id, current - 10)
+      dim = current - 10
    elseif current == 0 then
-      ez_vera.dim_actuate(child_id, 10)
+      dim = hyperion_util.cfg_get(hyperion_id, 'LastDim', '100')
    else
-      ez_vera.dim_actuate(child_id, 0)
+      dim = 0
    end
+   ez_vera.dim_actuate(child_id, dim)
 end
 
 function dim_up(hyperion_id)
@@ -29,11 +31,21 @@ function dim_up(hyperion_id)
    end
    local child_id = hyperion_util.get_child(hyperion_id, 'dimmer')
    local current = ez_vera.dim_get(child_id)
-   if current + 10 < 100 then
-      ez_vera.dim_actuate(child_id, current + 10)
+    
+   local dim
+   if current == 0 then
+      local last = tonumber(hyperion_util.cfg_get(hyperion_id, 'LastDim', '100'))
+      if last >= 50 then
+         dim = last
+      else
+         dim = 50
+      end
+   elseif current + 10 < 100 then
+      dim = current + 10
    else
-      ez_vera.dim_actuate(child_id, 100)
+      dim = 100
    end
+   ez_vera.dim_actuate(child_id, 50)
 end
 
 function temp_toggle(hyperion_id)
