@@ -12,7 +12,7 @@ function external_watch(lul_device, lul_service, lul_variable, lul_value_old, lu
    for device_id, params in pairs(luup.devices) do
       if luup.device_supports_service("urn:otakup0pe:serviceId:Hyperion1", device_id) then
          local update = false
-         for i, required_id in _G.ipairs(hyperion_util.device_list(device_id, 'required_devices')) do
+         for i, required_id in _G.ipairs(hyperion_util.device_list(device_id, 'require_devices')) do
             if required_id == my_id then
                log(device_id, 'info', "Updating due to required_device " .. required_id)
                update = true
@@ -36,13 +36,13 @@ function validate_device_list(hyperion_id, key)
    for i, dev in _G.ipairs(hyperion_util.device_list(hyperion_id, key)) do
       local device_id = tonumber(dev)
       if luup.devices[device_id] then
-         if luup.device_supports_service("urn:upnp-org:serviceId:SwitchPower1", device_id) then
-            log(device_id, "debug", "Supported device " .. dev .. " found")
-            luup.variable_watch("external_watch", "urn:upnp-org:serviceId:SwitchPower1", "Status", device_id)
-            table.insert(valid_devs, device_id)
-         elseif luup.device_supports_service("urn:upnp-org:serviceId:VSwitch1", device_id) then
+         if luup.device_supports_service("urn:upnp-org:serviceId:VSwitch1", device_id) then
             log(device_id, "debug", "Supported device " .. dev .. " found")
             luup.variable_watch("external_watch", "urn:upnp-org:serviceId:VSwitch1", "Status", device_id)
+            table.insert(valid_devs, device_id)
+         elseif luup.device_supports_service("urn:upnp-org:serviceId:SwitchPower1", device_id) then
+            log(device_id, "debug", "Supported device " .. dev .. " found")
+            luup.variable_watch("external_watch", "urn:upnp-org:serviceId:SwitchPower1", "Status", device_id)
             table.insert(valid_devs, device_id)
          else
             log(device_id, "warn", "Dropping unsupported device " .. dev)
@@ -63,6 +63,7 @@ function tick(lul_device)
    log(hyperion_id, 'debug', "TICK")
    hyperion_ambience.update(hyperion_id)
    luup.call_timer("tick", 1, "60", "", hyperion_id)
+   hyperion_util.cfg_set(hyperion_id, "LastTick", os.time())
 end
 
 function ensure_children(hyperion_id)
