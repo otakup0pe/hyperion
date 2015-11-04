@@ -74,6 +74,15 @@
       </allowedValueRange>
     </stateVariable>
     <stateVariable sendEvents="no">
+      <name>SunriseGrace</name>
+      <dataType>int</dataType>
+      <defaultValue>1800</defaultValue>
+      <allowedValueRange>
+        <minimum>0</minimum>
+        <maximum>3600</maximum>
+      </allowedValueRange>
+    </stateVariable>
+    <stateVariable sendEvents="no">
       <name>NightTemp</name>
       <dataType>int</dataType>
       <defaultValue>1500</defaultValue>

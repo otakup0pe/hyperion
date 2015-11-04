@@ -1,5 +1,6 @@
 local hyperion_util = require("hyperion_util")
 local hyperion_ambience = require("hyperion_ambience")
+local const = require("vera_constants")
 local ez_vera = require("ez_vera")
 
 local log = hyperion_util.log
@@ -10,7 +11,7 @@ function external_watch(lul_device, lul_service, lul_variable, lul_value_old, lu
       return
    end
    for device_id, params in pairs(luup.devices) do
-      if luup.device_supports_service("urn:otakup0pe:serviceId:Hyperion1", device_id) then
+      if luup.device_supports_service(const.SID_HYPERION, device_id) then
          local update = false
          for i, required_id in _G.ipairs(hyperion_util.device_list(device_id, 'require_devices')) do
             if required_id == my_id then
@@ -36,13 +37,13 @@ function validate_device_list(hyperion_id, key)
    for i, dev in _G.ipairs(hyperion_util.device_list(hyperion_id, key)) do
       local device_id = tonumber(dev)
       if luup.devices[device_id] then
-         if luup.device_supports_service("urn:upnp-org:serviceId:VSwitch1", device_id) then
+         if luup.device_supports_service(const.SID_VSWITCH, device_id) then
             log(device_id, "debug", "Supported device " .. dev .. " found")
-            luup.variable_watch("external_watch", "urn:upnp-org:serviceId:VSwitch1", "Status", device_id)
+            luup.variable_watch("external_watch", const.SID_VSWITCH, "Status", device_id)
             table.insert(valid_devs, device_id)
-         elseif luup.device_supports_service("urn:upnp-org:serviceId:SwitchPower1", device_id) then
+         elseif luup.device_supports_service(const.SID_SPOWER, device_id) then
             log(device_id, "debug", "Supported device " .. dev .. " found")
-            luup.variable_watch("external_watch", "urn:upnp-org:serviceId:SwitchPower1", "Status", device_id)
+            luup.variable_watch("external_watch", const.SID_SPOWER, "Status", device_id)
             table.insert(valid_devs, device_id)
          else
             log(device_id, "warn", "Dropping unsupported device " .. dev)
@@ -72,7 +73,7 @@ function ensure_children(hyperion_id)
    -- create dimmer
    local dim_child =  hyperion_util.get_child(hyperion_id, 'dimmer')
    if ( dim_child ) then
-      luup.variable_watch("child_watch", "urn:upnp-org:serviceId:DimmableLight1", "LoadLevelStatus", dim_child)
+      luup.variable_watch("child_watch", const.SID_DIMMABLE, "LoadLevelStatus", dim_child)
       if not ez_vera.dim_get(dim_child) then
          ez_vera.dim_set(dim_child, "0")
       end
@@ -83,7 +84,7 @@ function ensure_children(hyperion_id)
    -- create ambience control
    local ambience_child =  hyperion_util.get_child(hyperion_id, 'ambience')
    if ( ambience_child ) then
-      luup.variable_watch("child_watch", "urn:upnp-org:serviceId:SwitchPower1", "Status", ambience_child)
+      luup.variable_watch("child_watch", const.SID_SPOWER, "Status", ambience_child)
       if not ez_vera.switch_get(ambience_child) then
          ez_vera.switch_set(ambience_child, false)
       end
@@ -94,7 +95,7 @@ function ensure_children(hyperion_id)
    -- create temp control
    local temp_child =  hyperion_util.get_child(hyperion_id, 'temp')
    if ( temp_child ) then
-      luup.variable_watch("child_watch", "urn:upnp-org:serviceId:SwitchPower1", "Status", temp_child)
+      luup.variable_watch("child_watch", const.SID_SPOWER, "Status", temp_child)
       if not ez_vera.switch_get(temp_child) then
          ez_vera.switch_set(temp_child, false)
       end
@@ -169,17 +170,17 @@ function child_watch(lul_device, lul_service, lul_variable, lul_value_old, lul_v
    local device_id = tonumber(lul_device)
    local hyperion_id = hyperion_util.ensure_parent(device_id)
    if hyperion_util.get_child(hyperion_id, 'dimmer') == device_id then
-      if lul_service == "urn:upnp-org:serviceId:Dimming1" and lul_variable == "LoadLevelStatus"  then
+      if lul_service == const.SID_DIMMABLE and lul_variable == "LoadLevelStatus"  then
          do_dim(hyperion_id, lul_value_new)
-      elseif lul_service == "urn:upnp-org:serviceId:SwitchPower1" and lul_variable == "Status" then
+      elseif lul_service == const.SID_SPOWER and lul_variable == "Status" then
          do_switch(hyperion_id, lul_value_new)
       end
    elseif hyperion_util.get_child(hyperion_id, 'ambience') == device_id then
-      if lul_service == "urn:upnp-org:serviceId:SwitchPower1" and lul_variable == "Status" then
+      if lul_service == const.SID_SPOWER and lul_variable == "Status" then
          do_ambience(hyperion_id, lul_value_new)
       end
    elseif hyperion_util.get_child(hyperion_id, 'temp') == device_id then
-      if lul_service == "urn:upnp-org:serviceId:SwitchPower1" and lul_variable == "Status" then
+      if lul_service == const.SID_SPOWER and lul_variable == "Status" then
          do_temp(hyperion_id, lul_value_new)
       end
    end

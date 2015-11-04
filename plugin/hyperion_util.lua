@@ -1,6 +1,7 @@
 module("hyperion_util", package.seeall)
 
 local ez_vera = require("ez_vera")
+local const = require("vera_constants")
 
 local default_log_level = 'debug';
 
@@ -18,7 +19,7 @@ function log(device_id, level, message)
 end
 
 function cfg_get(device_id, key, default)
-   local val = luup.variable_get("urn:otakup0pe:serviceId:Hyperion1", key, device_id)
+   local val = luup.variable_get(const.SID_HYPERION, key, device_id)
    if val then
       return val
    else
@@ -28,7 +29,7 @@ function cfg_get(device_id, key, default)
 end
 
 function cfg_set(device_id, key, val)
-   luup.variable_set("urn:otakup0pe:serviceId:Hyperion1", key, val, device_id)
+   luup.variable_set(const.SID_HYPERION, key, val, device_id)
 end
 
 function device_list(device_id, key)
@@ -82,8 +83,8 @@ end
 function weather_condition(hyperion_id)
    local weather_id = cfg_get(hyperion_id, 'WeatherDevice', '')
    if weather_id then
-      if luup.device_supports_service("urn:upnp-micasaverde-com:serviceId:Weather1", weather_id) then
-         local condition = luup.variable_get("urn:upnp-micasaverde-com:serviceId:Weather1","ConditionGroup", weather_id)
+      if luup.device_supports_service(const.SID_WEATHER, weather_id) then
+         local condition = luup.variable_get(const.SID_WEATHER, "ConditionGroup", weather_id)
          log(hyperion_id, 'debug', "Weather #" .. weather_id .. " condition is " .. condition)
          return condition
       else

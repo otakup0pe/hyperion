@@ -1,4 +1,5 @@
 module("hyperion_scene", package.seeall)
+local const = require("vera_const")
 local ez_vera = require("ez_vera")
 local hyperion_util = require("hyperion_util")
 
@@ -7,7 +8,7 @@ function problem(message)
 end
 
 function dim_down(hyperion_id)
-   if not luup.device_supports_service("urn:otakup0pe:serviceId:Hyperion1", hyperion_id) then
+   if not luup.device_supports_service(const.SID_HYPERION, hyperion_id) then
       problem("Non hyperion device!")
       return
    end
@@ -25,7 +26,7 @@ function dim_down(hyperion_id)
 end
 
 function dim_up(hyperion_id)
-   if not luup.device_supports_service("urn:otakup0pe:serviceId:Hyperion1", hyperion_id) then
+   if not luup.device_supports_service(const.SID_HYPERION, hyperion_id) then
       problem("Non hyperion device!")
       return
    end
@@ -49,7 +50,7 @@ function dim_up(hyperion_id)
 end
 
 function temp_toggle(hyperion_id)
-   if not luup.device_supports_service("urn:otakup0pe:serviceId:Hyperion1", hyperion_id) then
+   if not luup.device_supports_service(const.SID_HYPERION, hyperion_id) then
       problem("Non hyperion device!")
       return
    end
@@ -66,7 +67,7 @@ function temp_toggle(hyperion_id)
 end
 
 function mode_toggle(hyperion_id)
-   if not luup.device_supports_service("urn:otakup0pe:serviceId:Hyperion1", hyperion_id) then
+   if not luup.device_supports_service(const.SID_HYPERION, hyperion_id) then
       problem("Non hyperion device!")
       return
    end

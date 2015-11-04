@@ -5,21 +5,50 @@ local hyperion_util = require("hyperion_util")
 local log = hyperion_util.log
 local cfg_get = hyperion_util.cfg_get
 
-function twilight_ambience(hyperion_id, device_id)
-   log(hyperion_id, "debug", "Twilight Ambience")
-   local sunset_grace = cfg_get(hyperion_id, "SunsetGrace", "900")
+function dawn_ambience(hyperion_id, device_id)
+   log(hyperion_id, "debug", "Dawn Ambience")
+   local evening_temp = tonumber(cfg_get(hyperion_id, "EveningTemp", "4500"))
+   local morning_time = tonumber(cfg_get(hyperion_id, "MorningTime", "07"))
+   local day_temp = tonumber(cfg_get(hyperion_id, "DayTemp", "5500"))
+   local sunrise_grace = tonumber(cfg_get(hyperion_id, "SunriseGrace", "1800"))
+   local now = os.time()
+   local morning_secs =  os.time{day=os.date("%d", now),
+                               month=os.date("%m", now),
+                               year=os.date("%Y", now),
+                               hour=morning_time,
+                               min=00,
+                               sec=00}
+   local sunrise = luup.sunrise()
+   local dim = 0
+   if luup.is_night() then
+      local dawn_percent = ( ( now - sunrise ) / ( sunrise - morning_secs ) ) * 100
+      dim = math.floor((dawn_percent /100) * hyperion_util.dim_get(hyperion_id))
+      if ez_vera.is_hue(device_id) then
+         ez_vera.hue_temp(device_id, evening_temp)
+      end
+   else
+      if ez_vera.is_hue(device_id) then
+         ez_vera.hue_temp(device_id, day_temp)
+      end
+   end
+   ez_vera.dim_actuate(device_id, dim)
+end
+
+function dusk_ambience(hyperion_id, device_id)
+   log(hyperion_id, "debug", "Dusk Ambience")
+   local sunset_grace = tonumber(cfg_get(hyperion_id, "SunsetGrace", "900"))
    local now = os.time()
    local sunset = luup.sunset()
-   local twilight = sunset - sunset_grace
-   local twilight_remaining = sunset - now
-   log(hyperion_id, "debug", "twilight dist " .. sunset_grace .. " remaining " .. twilight_remaining)
-   local twilight_percent
-   if twilight_remaining <= sunset_grace then
-      twilight_percent = (twilight_remaining / sunset_grace) * 100
+   local dusk = sunset - sunset_grace
+   local dusk_remaining = sunset - now
+   local dusk_percent
+   if dusk_remaining <= sunset_grace then
+      dusk_percent = (dusk_remaining / sunset_grace) * 100
    else
-      twilight_percent = 100
+      dusk_percent = 100
    end
-   dim = math.floor((twilight_percent/100) * hyperion_util.dim_get(hyperion_id))
+   dim = math.floor((dusk_percent/100) * hyperion_util.dim_get(hyperion_id))
+   log(hyperion_id, "debug", "dusk remaining " .. dusk_remaining .. " percent " .. dusk_percent .. " dim " .. dim)
    ez_vera.dim_actuate(device_id, dim)
 end
 
@@ -66,19 +95,7 @@ function night_ambience(hyperion_id, device_id)
       temp = math.floor(night_temp + ( ( time_to_night / evening_secs ) * temp_dist ))
    end
    log(hyperion_id, "debug", "setting temp to " .. temp)
-   if ( temp >= 2000 ) then
-      ez_vera.hue_temp(device_id + 1, temp)
-   else
-      local hue_start = 12521
-      local sat_start = 225
-      local hue_end = 10000
-      local sat_end = 235
-      local hue_diff = hue_start - hue_end
-      local sat_diff = sat_start - sat_end
-      local hue_scaled = hue_end + math.floor(hue_diff * (temp - 1000) / 500)
-      local sat_scaled = sat_end + math.floor(sat_diff * (temp - 1000) / 500)
-      ez_vera.hue_colour(device_id + 1, hue_scaled, sat_scaled)
-   end
+   ez_vera.hue_temp(device_id + 1, temp)
 end
 
 function ambience_gate(hyperion_id)
@@ -110,13 +127,20 @@ function dim_group(hyperion_id, lights, cb)
 end
 
 function update_ambient(hyperion_id, lights)
-   local sunset_grace = cfg_get(hyperion_id, "SunsetGrace", "900")
-   local day_temp = cfg_get(hyperion_id, "DayTemp", "5500")
-   local time_to_sunset = (os.time() - luup.sunset())
+   local sunset_grace = tonumber(cfg_get(hyperion_id, "SunsetGrace", "900"))
+   local sunrise_grace = tonumber(cfg_get(hyperion_id, "SunriseGrace", "1800"))
+   local morning_time = tonumber(cfg_get(hyperion_id, "MorningTime", "07"))
+   local day_temp = tonumber(cfg_get(hyperion_id, "DayTemp", "5500"))
+   local now = os.time()
+   local time_to_sunset = 0 - (now - luup.sunset())
+   local time_past_sunrise = now - (luup.sunrise() - 86400)
+   local past_dawn = tonumber(os.date("%H", now)) >= morning_time;
    local op = nil
-   log(hyperion_id, 'debug', "Time to sunset " .. time_to_sunset)
-   if (time_to_sunset >= (0 - sunset_grace)) and time_to_sunset <= 0 then
-      op = 'twilight'
+   log(hyperion_id, 'debug', "Time to sunset " .. time_to_sunset .. " Past dawn " .. tostring(past_dawn) .. " Time past sunrise " .. time_past_sunrise)
+   if time_to_sunset >= 0 and (time_to_sunset <= sunset_grace) then
+      op = 'dusk'
+   elseif time_past_sunrise >= 0 and post_dawn and ( time_past_sunrise <= sunrise_grace ) then
+      op = 'dawn'
    elseif luup.is_night() then
       op = 'night'
    else
@@ -129,8 +153,8 @@ function update_ambient(hyperion_id, lights)
             night_ambience(hyperion_id, device_id)
          end
          ez_vera.dim_actuate(device_id, dim)
-      elseif ( op == 'twilight' ) then
-         twilight_ambience(hyperion_id, device_id)
+      elseif ( op == 'dusk' ) then
+         dusk_ambience(hyperion_id, device_id)
          if ( ez_vera.is_hue(device_id) ) then
             ez_vera.hue_temp(device_id + 1, day_temp)
          end
@@ -147,13 +171,15 @@ function update_ambient(hyperion_id, lights)
          else
             ez_vera.switch_actuate(device_id, false)
          end
+      elseif op == 'dawn' then
+         dawn_ambience(hyperion_id, device_id)
       end
    end
    dim_group(hyperion_id, lights, cb)
 end
 
 function update_preset(hyperion_id, lights)
-   local preset = hyperion_util.cfg_get(hyperion_id, 'Preset', 3250)
+   local preset = tonumber(hyperion_util.cfg_get(hyperion_id, 'Preset', 3250))
    local dim = hyperion_util.dim_get(hyperion_id)
    log(hyperion_id, 'debug', 'Updating preset ' .. preset)
    local cb = function(hyperion_id, device_id)
