@@ -1,5 +1,5 @@
 module("hyperion_scene", package.seeall)
-local const = require("vera_const")
+local const = require("vera_constants")
 local ez_vera = require("ez_vera")
 local hyperion_util = require("hyperion_util")
 
@@ -46,7 +46,7 @@ function dim_up(hyperion_id)
    else
       dim = 100
    end
-   ez_vera.dim_actuate(child_id, 50)
+   ez_vera.dim_actuate(child_id, dim)
 end
 
 function temp_toggle(hyperion_id)
