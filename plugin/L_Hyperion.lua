@@ -2,7 +2,6 @@ local hyperion_util = require("hyperion_util")
 local hyperion_ambience = require("hyperion_ambience")
 local const = require("vera_constants")
 local ez_vera = require("ez_vera")
-
 local log = hyperion_util.log
 
 function external_watch(lul_device, lul_service, lul_variable, lul_value_old, lul_value_new)
@@ -10,23 +9,23 @@ function external_watch(lul_device, lul_service, lul_variable, lul_value_old, lu
    if lul_variable ~= "Status" then
       return
    end
-   for device_id, params in pairs(luup.devices) do
-      if luup.device_supports_service(const.SID_HYPERION, device_id) then
+   for maybe_hyperion_id, params in pairs(luup.devices) do
+      if luup.device_supports_service(const.SID_HYPERION, maybe_hyperion_id) then
          local update = false
-         for i, required_id in _G.ipairs(hyperion_util.device_list(device_id, 'require_devices')) do
+         for i, required_id in _G.ipairs(hyperion_util.device_list(maybe_hyperion_id, 'require_devices')) do
             if required_id == my_id then
-               log(device_id, 'info', "Updating due to required_device " .. required_id)
+               log(maybe_hyperion_id, 'info', "Updating due to required_device " .. required_id)
                update = true
             end
          end
-         for i, override_id in _G.ipairs(hyperion_util.device_list(device_id, 'override_devices')) do
+         for i, override_id in _G.ipairs(hyperion_util.device_list(maybe_hyperion_id, 'override_devices')) do
             if override_id == my_id then
-               log(device_id, 'info', "Updating due to override_device " .. override_id)
+               log(maybe_hyperion_id, 'info', "Updating due to override_device " .. override_id)
                update = true
             end
          end
          if update then
-            hyperion_ambience.update(device_id)
+            hyperion_ambience.update(maybe_hyperion_id)
          end
       end
    end

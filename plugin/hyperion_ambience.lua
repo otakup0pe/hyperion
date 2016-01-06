@@ -3,14 +3,14 @@ module("hyperion_ambience", package.seeall)
 local ez_vera = require("ez_vera")
 local hyperion_util = require("hyperion_util")
 local log = hyperion_util.log
-local cfg_get = hyperion_util.cfg_get
+local cfg = require("hyperion_config")
 
 function dawn_ambience(hyperion_id, device_id)
    log(hyperion_id, "debug", "Dawn Ambience")
-   local evening_temp = tonumber(cfg_get(hyperion_id, "EveningTemp", "4500"))
-   local morning_time = tonumber(cfg_get(hyperion_id, "MorningTime", "07"))
-   local day_temp = tonumber(cfg_get(hyperion_id, "DayTemp", "5500"))
-   local sunrise_grace = tonumber(cfg_get(hyperion_id, "SunriseGrace", "1800"))
+   local evening_temp = cfg.evening_temp()
+   local morning_time = cfg.morning_time()
+   local day_temp = cfg.day_temp()
+   local sunrise_grace = cfg.sunrise_grace()
    local now = os.time()
    local morning_secs =  os.time{day=os.date("%d", now),
                                month=os.date("%m", now),
@@ -36,7 +36,7 @@ end
 
 function dusk_ambience(hyperion_id, device_id)
    log(hyperion_id, "debug", "Dusk Ambience")
-   local sunset_grace = tonumber(cfg_get(hyperion_id, "SunsetGrace", "900"))
+   local sunset_grace = cfg.sunset_grace()
    local now = os.time()
    local sunset = luup.sunset()
    local dusk = sunset - sunset_grace
@@ -47,7 +47,8 @@ function dusk_ambience(hyperion_id, device_id)
    else
       dusk_percent = 100
    end
-   dim = math.floor((dusk_percent/100) * hyperion_util.dim_get(hyperion_id))
+   local current_dim = hyperion_util.dim_get(hyperion_id)
+   local dim = math.floor((dusk_percent/100) * current_dim)
    log(hyperion_id, "debug", "dusk remaining " .. dusk_remaining .. " percent " .. dusk_percent .. " dim " .. dim)
    ez_vera.dim_actuate(device_id, dim)
 end
@@ -55,9 +56,9 @@ end
 function night_ambience(hyperion_id, device_id)
    log(hyperion_id, "debug", "Night Ambience")
    -- configs
-   local night_time = tonumber(cfg_get(hyperion_id, "NightTime", "22"))
-   local night_temp = tonumber(cfg_get(hyperion_id, "NightTemp", "1500"))
-   local evening_temp = tonumber(cfg_get(hyperion_id, "EveningTemp", "4500"))
+   local night_time = cfg.night_time()
+   local night_temp = cfg.night_temp()
+   local evening_temp = cfg.evening_temp()
    -- start by calculating time to bed time
    local now = os.time()
    -- after bedtime we should be at our warmest
@@ -127,21 +128,22 @@ function dim_group(hyperion_id, lights, cb)
 end
 
 function update_ambient(hyperion_id, lights)
-   local sunset_grace = tonumber(cfg_get(hyperion_id, "SunsetGrace", "900"))
-   local sunrise_grace = tonumber(cfg_get(hyperion_id, "SunriseGrace", "1800"))
-   local morning_time = tonumber(cfg_get(hyperion_id, "MorningTime", "07"))
-   local day_temp = tonumber(cfg_get(hyperion_id, "DayTemp", "5500"))
+   local sunset_grace = cfg.sunset_grace()
+   local sunrise_grace = cfg.sunrise_grace()
+   local morning_time = cfg.morning_time()
+   local day_temp = cfg.day_temp()
    local now = os.time()
    local time_to_sunset = 0 - (now - luup.sunset())
    local time_past_sunrise = now - (luup.sunrise() - 86400)
    local past_dawn = tonumber(os.date("%H", now)) >= morning_time;
+   local is_night = luup.is_night();
    local op = nil
    log(hyperion_id, 'debug', "Time to sunset " .. time_to_sunset .. " Past dawn " .. tostring(past_dawn) .. " Time past sunrise " .. time_past_sunrise)
-   if time_to_sunset >= 0 and (time_to_sunset <= sunset_grace) then
+   if (time_to_sunset >= 0 and (time_to_sunset <= sunset_grace)) or ((time_to_sunset > -120) and time_to_sunset <= 0 ) then
       op = 'dusk'
    elseif time_past_sunrise >= 0 and post_dawn and ( time_past_sunrise <= sunrise_grace ) then
       op = 'dawn'
-   elseif luup.is_night() then
+   elseif is_night then
       op = 'night'
    else
       op = 'day'
@@ -179,7 +181,7 @@ function update_ambient(hyperion_id, lights)
 end
 
 function update_preset(hyperion_id, lights)
-   local preset = tonumber(hyperion_util.cfg_get(hyperion_id, 'Preset', 3250))
+   local preset = cfg.preset()
    local dim = hyperion_util.dim_get(hyperion_id)
    log(hyperion_id, 'debug', 'Updating preset ' .. preset)
    local cb = function(hyperion_id, device_id)
@@ -206,7 +208,7 @@ function update(hyperion_id)
    if not ez_vera.switch_get(hyperion_id) then
       log(hyperion_id, "debug", "This switch is disabled")
    else
-      if hyperion_util.cfg_get(hyperion_id, 'Ambience', "0") == "0" then
+      if cfg.ambience() == "0" then
          update_preset(hyperion_id, lights)
       else
          if not ambience_gate(hyperion_id) then

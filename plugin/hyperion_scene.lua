@@ -12,6 +12,9 @@ function dim_down(hyperion_id)
       problem("Non hyperion device!")
       return
    end
+   if not ez_vera.switch_get(hyperion_id) then
+      ez_vera.switch_set(hyperion_id, true)
+   end
    local child_id = hyperion_util.get_child(hyperion_id, 'dimmer')
    local current = ez_vera.dim_get(child_id)
    local dim
@@ -30,6 +33,10 @@ function dim_up(hyperion_id)
       problem("Non hyperion device!")
       return
    end
+   if not ez_vera.switch_get(hyperion_id) then
+      ez_vera.switch_set(hyperion_id, true)
+   end
+      
    local child_id = hyperion_util.get_child(hyperion_id, 'dimmer')
    local current = ez_vera.dim_get(child_id)
     
@@ -54,6 +61,10 @@ function temp_toggle(hyperion_id)
       problem("Non hyperion device!")
       return
    end
+   if not ez_vera.switch_get(hyperion_id) then
+      ez_vera.switch_set(hyperion_id, true)
+   end
+
    local ambience_id = hyperion_util.get_child(hyperion_id, 'ambience')
    local dim_id = hyperion_util.get_child(hyperion_id, 'dimmer')
    if not ez_vera.switch_get(dim_id) then
@@ -71,6 +82,10 @@ function mode_toggle(hyperion_id)
       problem("Non hyperion device!")
       return
    end
+   if not ez_vera.switch_get(hyperion_id) then
+      ez_vera.switch_set(hyperion_id, true)
+   end
+
    local ambience_id = hyperion_util.get_child(hyperion_id, 'ambience')
    local dim_id = hyperion_util.get_child(hyperion_id, 'dimmer')
    local current = ez_vera.switch_get(dim_id)
