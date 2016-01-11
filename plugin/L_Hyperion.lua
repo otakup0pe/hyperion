@@ -148,11 +148,7 @@ function do_ambience(hyperion_id, target)
 end
 
 function do_temp(hyperion_id, target)
-   local val = "3250"
-   if target == "1" then
-      val = "5000"
-   end
-   hyperion_util.cfg_set(hyperion_id, 'Preset', val)
+   hyperion_util.cfg_set(hyperion_id, 'Preset', target)
    ez_vera.switch_set(hyperion_util.get_child(hyperion_id, 'temp'), target)
 end
 
@@ -212,13 +208,7 @@ end
 
 function temp_set(lul_device, name, temp)
    local hyperion_id = tonumber(lul_device)
-   local child_id = hyperion_util.get_child(hyperion_id, 'temp')
    hyperion_util.cfg_set(hyperion_id, name, temp)
-   if temp == "3250" then
-      ez_vera.switch_set(child_id, false)
-   else
-      ez_vera.switch_set(child_id, true)
-   end
    hyperion_ambience.update(hyperion_id)
    return true
 end
@@ -229,5 +219,58 @@ function ambience_set(lul_device, enabled)
    hyperion_util.cfg_set(hyperion_id, 'Ambience', enabled)
    ez_vera.switch_set(child_id, enabled)
    hyperion_ambience.update(hyperion_id)
+   return true
+end
+
+function feature_set(lul_device, name, enabled)
+   local hyperion_id = tonumber(lul_device)
+   hyperion_util.cfg_set(hyperion_id, name, enabled)
+   hyperion_ambience.update(hyperion_id)
+   return true
+end
+
+function set_hour(lul_device, name, hour)
+   local hyperion_id = tonumber(lul_device)
+   hyperion_util.cfg_set(hyperion_id, name .. 'Hour', hour)
+   hyperion_ambience.update(hyperion_id)
+   return true
+end
+
+function set_minute(lul_device, name, minute)
+   local hyperion_id = tonumber(lul_device)
+   hyperion_util.cfg_set(hyperion_id, name .. 'Minute', minute)
+   hyperion_ambience.update(hyperion_id)
+   return true
+end
+
+function set_grace(lul_device, name, time)
+   local hyperion_id = tonumber(lul_device)
+   hyperion_util.cfg_set(hyperion_id, name .. 'Grace', time)
+   hyperion_ambience.update(hyperion_id)
+   return true
+end
+
+function set_preset(lul_device, preset)
+   local hyperion_id = tonumber(lul_device)
+   hyperion_util.cfg_set(hyperion_id, 'Preset', preset)
+   hyperion_ambience.update(hyperion_id)
+   local child_id = hyperion_util.get_child(hyperion_id, 'temp')
+   if preset == "1" then
+      ez_vera.switch_set(child_id, true)
+   else
+      ez_vera.switch_set(child_id, false)
+   end
+   return true
+end
+
+function set_increment(lul_device, increment)
+   local hyperion_id = tonumber(lul_device)
+   hyperion_util.cfg_set(hyperion_id, 'DimIncrement', increment)
+   return true
+end
+
+function set_dim_min(lul_device, dim)
+   local hyperion_id = tonumber(lul_device)
+   hyperion_util.cfg_set(hyperion_id, 'DimUpMin', dim)
    return true
 end

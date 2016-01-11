@@ -38,5 +38,54 @@
         return ambience_set(lul_device, lul_settings.Enabled)
       </run>
     </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>SetFeature</name>
+      <run>
+        return feature_set(lul_device, lul_settings.Name, lul_settings.Enabled)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>SetHour</name>
+      <run>
+        return set_hour(lul_device, lul_settings.Name, lul_settings.Hour)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>SetMinute</name>
+      <run>
+        return set_minute(lul_device, lul_settings.Name, lul_settings.Minute)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>SetGrace</name>
+      <run>
+        return set_grace(lul_device, lul_settings.Name, lul_settings.Time)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>SetPreset</name>
+      <run>
+        return set_preset(lul_device, lul_settings.Preset)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>SetIncrement</name>
+      <run>
+        return set_increment(lul_device, lul_settings.Increment)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>SetDimMin</name>
+      <run>
+        return set_dim_min(lul_device, lul_settings.Dim)
+      </run>
+    </action>
   </actionList>
 </implementation>

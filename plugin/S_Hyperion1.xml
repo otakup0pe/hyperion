@@ -19,11 +19,54 @@
       <name>A_ARG_TYPE_TempName</name>,
       <dataType>string</dataType>
       <allowedValueList>
-        <allowedValue></allowedValue>
-        <allowedValue>info</allowedValue>
-        <allowedValue>warn</allowedValue>
-        <allowedValue>error</allowedValue>
+        <allowedValue>DayTemp</allowedValue>
+        <allowedValue>NightTemp</allowedValue>
+        <allowedValue>EveningTemp</allowedValue>
+        <allowedValue>PresetOne</allowedValue>
+        <allowedValue>PresetTwo</allowedValue>
       </allowedValueList>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>A_ARG_TYPE_TimeName</name>,
+      <dataType>string</dataType>
+      <allowedValueList>
+        <allowedValue>Morning</allowedValue>
+        <allowedValue>Night</allowedValue>
+      </allowedValueList>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>A_ARG_TYPE_GraceName</name>,
+      <dataType>string</dataType>
+      <allowedValueList>
+        <allowedValue>Sunrise</allowedValue>
+        <allowedValue>Sunset</allowedValue>
+      </allowedValueList>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>A_ARG_TYPE_FeatureName</name>,
+      <dataType>string</dataType>
+      <allowedValueList>
+        <allowedValue>AmbientDaytime</allowedValue>
+        <allowedValue>AmbientDusk</allowedValue>
+        <allowedValue>AmbientNight</allowedValue>
+        <allowedValue>AmbientDawn</allowedValue>
+      </allowedValueList>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>A_ARG_TYPE_Increment</name>,
+      <dataType>int</dataType>
+      <allowedValueRange>
+        <minimum>1</minimum>
+        <maximum>100</maximum>
+      </allowedValueRange>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>A_ARG_TYPE_GraceTime</name>,
+      <dataType>int</dataType>
+      <allowedValueRange>
+        <minimum>0</minimum>
+        <maximum>10800</maximum>
+      </allowedValueRange>
     </stateVariable>
     <stateVariable sendEvents="no">
       <name>A_ARG_TYPE_Temp</name>,
@@ -42,26 +85,60 @@
       </allowedValueRange>
     </stateVariable>
     <stateVariable sendEvents="no">
-      <name>LogLevel</name>
-      <dataType>string</dataType>
-      <defaultValue>debug</defaultValue>
-    </stateVariable>
-    <stateVariable sendEvents="no">
-      <name>NightTime</name>
+      <name>A_ARG_TYPE_Hour</name>,
       <dataType>int</dataType>
-      <defaultValue>22</defaultValue>
       <allowedValueRange>
         <minimum>0</minimum>
         <maximum>23</maximum>
       </allowedValueRange>
     </stateVariable>
     <stateVariable sendEvents="no">
-      <name>MorningTime</name>
+      <name>A_ARG_TYPE_Minute</name>,
+      <dataType>int</dataType>
+      <allowedValueRange>
+        <minimum>0</minimum>
+        <maximum>59</maximum>
+      </allowedValueRange>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>LogLevel</name>
+      <dataType>string</dataType>
+      <defaultValue>debug</defaultValue>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>NightHour</name>
+      <dataType>int</dataType>
+      <defaultValue>00</defaultValue>
+      <allowedValueRange>
+        <minimum>0</minimum>
+        <maximum>23</maximum>
+      </allowedValueRange>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>NightMinute</name>
+      <dataType>int</dataType>
+      <defaultValue>00</defaultValue>
+      <allowedValueRange>
+        <minimum>0</minimum>
+        <maximum>59</maximum>
+      </allowedValueRange>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>MorninggHour</name>
       <dataType>int</dataType>
       <defaultValue>06</defaultValue>
       <allowedValueRange>
         <minimum>0</minimum>
         <maximum>23</maximum>
+      </allowedValueRange>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>MorningMinute</name>
+      <dataType>int</dataType>
+      <defaultValue>00</defaultValue>
+      <allowedValueRange>
+        <minimum>0</minimum>
+        <maximum>59</maximum>
       </allowedValueRange>
     </stateVariable>
     <stateVariable sendEvents="no">
@@ -101,7 +178,16 @@
       </allowedValueRange>
     </stateVariable>
     <stateVariable sendEvents="no">
-      <name>PresetTemp</name>
+      <name>PresetOne</name>
+      <dataType>int</dataType>
+      <defaultValue>5500</defaultValue>
+      <allowedValueRange>
+        <minimum>1500</minimum>
+        <maximum>5500</maximum>
+      </allowedValueRange>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>PresetTwo</name>
       <dataType>int</dataType>
       <defaultValue>3250</defaultValue>
       <allowedValueRange>
@@ -120,6 +206,51 @@
     </stateVariable>
     <stateVariable sendEvents="no">
       <name>Ambience</name>
+      <dataType>int</dataType>
+      <defaultValue>1</defaultValue>
+      <allowedValueRange>
+        <minimum>0</minimum>
+        <maximum>1</maximum>
+      </allowedValueRange>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>Preset</name>
+      <dataType>int</dataType>
+      <defaultValue>1</defaultValue>
+      <allowedValueRange>
+        <minimum>0</minimum>
+        <maximum>1</maximum>
+      </allowedValueRange>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>AmbientDaytime</name>
+      <dataType>int</dataType>
+      <defaultValue>1</defaultValue>
+      <allowedValueRange>
+        <minimum>0</minimum>
+        <maximum>1</maximum>
+      </allowedValueRange>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>AmbientDusk</name>
+      <dataType>int</dataType>
+      <defaultValue>1</defaultValue>
+      <allowedValueRange>
+        <minimum>0</minimum>
+        <maximum>1</maximum>
+      </allowedValueRange>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>AmbientNight</name>
+      <dataType>int</dataType>
+      <defaultValue>1</defaultValue>
+      <allowedValueRange>
+        <minimum>0</minimum>
+        <maximum>1</maximum>
+      </allowedValueRange>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>AmbientDawn</name>
       <dataType>int</dataType>
       <defaultValue>1</defaultValue>
       <allowedValueRange>
@@ -164,5 +295,95 @@
         </argument>
       </argumentList>
     </action>
+    <action>
+      <name>SetFeature</name>
+      <argumentList>
+        <argument>
+          <name>Name</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_FeatureName</relatedStateVariable>
+        </argument>
+        <argument>
+          <name>Enabled</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_Bool</relatedStateVariable>
+        </argument>
+      </argumentList>
+    </action>
+    <action>
+      <name>SetHour</name>
+      <argumentList>
+        <argument>
+          <name>Name</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_TimeName</relatedStateVariable>
+        </argument>
+        <argument>
+          <name>Hour</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_Hour</relatedStateVariable>
+        </argument>
+      </argumentList>
+    </action>
+    <action>
+      <name>SetMinute</name>
+      <argumentList>
+        <argument>
+          <name>Name</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_TimeName</relatedStateVariable>
+        </argument>
+        <argument>
+          <name>Minute</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_Minute</relatedStateVariable>
+        </argument>
+      </argumentList>
+    </action>
+    <action>
+      <name>SetGrace</name>
+      <argumentList>
+        <argument>
+          <name>Name</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_GraceName</relatedStateVariable>
+        </argument>
+        <argument>
+          <name>Length</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_GraceLength</relatedStateVariable>
+        </argument>
+      </argumentList>
+    </action>
+    <action>
+      <name>SetPreset</name>
+      <argumentList>
+        <argument>
+          <name>Preset</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_Bool</relatedStateVariable>
+        </argument>
+      </argumentList>
+    </action>
+    <action>
+      <name>SetIncrement</name>
+      <argumentList>
+        <argument>
+          <name>Increment</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_Increment</relatedStateVariable>
+        </argument>
+      </argumentList>
+    </action>
+    <action>
+      <name>SetDimMin</name>
+      <argumentList>
+        <argument>
+          <name>Dim</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_Increment</relatedStateVariable>
+        </argument>
+      </argumentList>
+    </action>    
   </actionList>
 </scpd>

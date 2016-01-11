@@ -28,7 +28,6 @@
       },
       "Position": "0",
       "TabType": "flash",
-      "top_navigation_tab": 1,
       "ControlGroup": [
         {
           "id": "1",
@@ -47,12 +46,25 @@
       ],
       "Control": [
         {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "control_title",
+            "text": "Device Controls"
+          },
+          "Display": {
+            "Top": "0",
+            "Left": "0",
+            "Width": "400",
+            "Height": "20"
+          }
+        },
+        {
           "ControlGroup": "1",
           "ControlType": "multi_state_button",
           "top": "1",
           "left": "0",
           "Display": {
-            "Top": "0",
+            "Top": "30",
             "Left": "0",
             "Width": "50",
             "Height": "20"
@@ -112,8 +124,8 @@
           "top": "2",
           "left": "0",
           "Display": {
-            "Top": "0",
-            "Left": "60",
+            "Top": "90",
+            "Left": "0",
             "Width": "50",
             "Height": "20"
           },
@@ -127,19 +139,15 @@
               "Display": {
                 "Service": "urn:otakup0pe:serviceId:Hyperion1",
                 "Variable": "Preset",
-                "Value": "5000"
+                "Value": "1"
               },
               "Command": {
                 "Service": "urn:otakup0pe:serviceId:Hyperion1",
-                "Action": "SetTemp",
+                "Action": "SetPreset",
                 "Parameters": [
                   {
-                    "Name": "Name",
-                    "Value": "Preset"
-                  },
-                  {
-                    "Name": "Temp",
-                    "Value": "5000"
+                    "Name": "Preset",
+                    "Value": "1"
                   }
                 ]
               },
@@ -154,19 +162,15 @@
               "Display": {
                 "Service": "urn:otakup0pe:serviceId:Hyperion1",
                 "Variable": "Preset",
-                "Value": "3250"
+                "Value": "0"
               },
               "Command": {
                 "Service": "urn:otakup0pe:serviceId:Hyperion1",
-                "Action": "SetTemp",
+                "Action": "SetPreset",
                 "Parameters": [
                   {
-                    "Name": "Name",
-                    "Value": "Preset"
-                  },
-                  {
-                    "Name": "Temp",
-                    "Value": "3250"
+                    "Name": "Preset",
+                    "Value": "0"
                   }
                 ]
               },
@@ -180,8 +184,8 @@
           "top": "3",
           "left": "0",
           "Display": {
-            "Top": "0",
-            "Left": "120",
+            "Top": "150",
+            "Left": "0",
             "Width": "50",
             "Height": "20"
           },
@@ -233,6 +237,808 @@
               "ControlCode": "cmd_preset"
             }
           ]
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "enabled_desc",
+            "text": "Enable for Hyperion control of selected devices."
+          },
+          "Display": {
+            "Top": "15",
+            "Left": "70",
+            "Width": "800",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "preset_temp_desc",
+            "text": "Select between warm and cold color preset temperatures."
+          },
+          "Display": {
+            "Top": "75",
+            "Left": "70",
+            "Width": "800",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "preset_desc",
+            "text": "Select between ambient lighting or preset temperatures."
+          },
+          "Display": {
+            "Top": "135",
+            "Left": "70",
+            "Width": "800",
+            "Height": "20"
+          }
+        }
+      ]
+    },
+    {
+      "Label": {
+        "lang_text": "time_settings",
+        "text": "Time Settings"
+      },
+      "TabType": "javascript",
+      "ScriptName": "J_Hyperion1.js",
+      "Function": "time_settings_callback"
+    },
+    {
+      "Label": {
+        "lang_text": "temp_tab",
+        "text": "Color Temperature"
+      },
+      "TabType": "flash",
+      "Control": [
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "day_temp",
+            "text": "Daylight"
+          },
+          "Display": {
+            "Top": "15",
+            "Left": "0",
+            "Width": "100",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "night_temp",
+            "text": "Night"
+          },
+          "Display": {
+            "Top": "75",
+            "Left": "0",
+            "Width": "100",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "evening_temp",
+            "text": "Evening"
+          },
+          "Display": {
+            "Top": "135",
+            "Left": "0",
+            "Width": "100",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "warm_preset_temp",
+            "text": "Warm Preset"
+          },
+          "Display": {
+            "Top": "195",
+            "Left": "0",
+            "Width": "100",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "cold_preset_temp",
+            "text": "Cold Preset"
+          },
+          "Display": {
+            "Top": "255",
+            "Left": "0",
+            "Width": "100",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "slider",
+          "Label": {
+            "lang_text": "day_temp",
+            "text": "Day"
+          },
+          "Display": {
+            "Top": "30",
+            "Left": "110",
+            "Width": "300",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "DayTemp",
+            "ID": "DayTemp",
+            "MinValue": 1500,
+            "MaxValue": 5500
+          },
+          "Command": {
+            "Service":"urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetTemp",
+            "Parameters": [
+              {
+                "Name": "Name",
+                "Value": "DayTemp"
+              },
+              {
+                "Name": "Temp",
+                "ID": "DayTemp"
+              }
+            ]
+          }
+        },
+        {
+          "ControlType": "slider",
+          "Label": {
+            "lang_text": "night_temp",
+            "text": "Night"
+          },
+          "Display": {
+            "Top": "90",
+            "Left": "110",
+            "Width": "300",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "NightTemp",
+            "ID": "NightTemp",
+            "MinValue": 1500,
+            "MaxValue": 5500
+          },
+          "Command": {
+            "Service":"urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetTemp",
+            "Parameters": [
+              {
+                "Name": "Name",
+                "Value": "NightTemp"
+              },
+              {
+                "Name": "Temp",
+                "ID": "NightTemp"
+              }
+            ]
+          }
+        },
+        {
+          "ControlType": "slider",
+          "Label": {
+            "lang_text": "evening_temp",
+            "text": "Evening"
+          },
+          "Display": {
+            "Top": "150",
+            "Left": "110",
+            "Width": "300",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "EveningTemp",
+            "ID": "EveningTemp",
+            "MinValue": 1500,
+            "MaxValue": 5500
+          },
+          "Command": {
+            "Service":"urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetTemp",
+            "Parameters": [
+              {
+                "Name": "Name",
+                "Value": "EveningTemp"
+              },
+              {
+                "Name": "Temp",
+                "ID": "EveningTemp"
+              }
+            ]
+          }
+        },
+        {
+          "ControlType": "slider",
+          "Label": {
+            "lang_text": "warm_preset_temp",
+            "text": "Warm Preset Temp"
+          },
+          "Display": {
+            "Top": "210",
+            "Left": "110",
+            "Width": "300",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "PresetOne",
+            "ID": "PresetOne",
+            "MinValue": 1500,
+            "MaxValue": 5500
+          },
+          "Command": {
+            "Service":"urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetTemp",
+            "Parameters": [
+              {
+                "Name": "Name",
+                "Value": "PresetOne"
+              },
+              {
+                "Name": "Temp",
+                "ID": "PresetOne"
+              }
+            ]
+          }
+        },
+        {
+          "ControlType": "slider",
+          "Label": {
+            "lang_text": "cold_preset_temp",
+            "text": "Cold Preset"
+          },
+          "Display": {
+            "Top": "270",
+            "Left": "110",
+            "Width": "300",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "PresetTwo",
+            "ID": "PresetTwo",
+            "MinValue": 1500,
+            "MaxValue": 5500
+          },
+          "Command": {
+            "Service":"urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetTemp",
+            "Parameters": [
+              {
+                "Name": "Name",
+                "Value": "PresetTwo"
+              },
+              {
+                "Name": "Temp",
+                "ID": "PresetTwo"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "Label": {
+        "lang_text": "feature_settings",
+        "text": "Features & Configuration"
+      },
+      "TabType": "flash",
+      "Control": [
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "ambient_daylight",
+            "text": "Daylight Ambience"
+          },
+          "Display": {
+            "Top": "15",
+            "Left": "0",
+            "Width": "60",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "ambient_dusk",
+            "text": "Dusk Ambience"
+          },
+          "Display": {
+            "Top": "75",
+            "Left": "0",
+            "Width": "60",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "ambient_night",
+            "text": "Nighttime Ambience"
+          },
+          "Display": {
+            "Top": "135",
+            "Left": "0",
+            "Width": "60",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "ambient_dawn",
+            "text": "Dawn Ambience"
+          },
+          "Display": {
+            "Top": "195",
+            "Left": "0",
+            "Width": "60",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "dim_increment",
+            "text": "Dimming Increment"
+          },
+          "Display": {
+            "Top": "255",
+            "Left": "0",
+            "Width": "60",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "dim_up_min",
+            "text": "Min Brightness"
+          },
+          "Display": {
+            "Top": "315",
+            "Left": "0",
+            "Width": "60",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "log_level",
+            "text": "Log Level"
+          },
+          "Display": {
+            "Top": "375",
+            "Left": "0",
+            "Width": "60",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "multi_state_button",
+          "Display": {
+            "Top": "0",
+            "Left": "120",
+            "Width": "50",
+            "Height": "20"
+          },
+          "states":[
+            {
+              "Label": {
+                "lang_tag": "ui7_cmd_on",
+                "text": "On"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "AmbientDaytime",
+                "Value": "1"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetFeature",
+                "Parameters": [
+                  {
+                    "Name": "Name",
+                    "Value": "AmbientDaytime"
+                  },
+                  {
+                    "Name": "Enabled",
+                    "Value": "1"
+                  }
+                ]
+              },
+              "ControlCode": "power_on"
+            },
+            {
+              "Label": {
+                "lang_tag": "ui7_cmd_off",
+                "text": "Off"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "AmbientDaytime",
+                "Value": "0"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetFeature",
+                "Parameters": [
+                  {
+                    "Name": "Name",
+                    "Value": "AmbientDaytime"
+                  },
+                  {
+                    "Name": "Enabled",
+                    "Value": "0"
+                  }
+                ]
+              },
+              "ControlCode": "power_off"
+            }
+          ]
+        },
+        {
+          "ControlType": "multi_state_button",
+          "Display": {
+            "Top": "60",
+            "Left": "120",
+            "Width": "50",
+            "Height": "20"
+          },
+          "states":[
+            {
+              "Label": {
+                "lang_tag": "ui7_cmd_on",
+                "text": "On"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "AmbientDusk",
+                "Value": "1"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetFeature",
+                "Parameters": [
+                  {
+                    "Name": "Name",
+                    "Value": "AmbientDusk"
+                  },
+                  {
+                    "Name": "Enabled",
+                    "Value": "1"
+                  }
+                ]
+              },
+              "ControlCode": "power_on"
+            },
+            {
+              "Label": {
+                "lang_tag": "ui7_cmd_off",
+                "text": "Off"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "AmbientDusk",
+                "Value": "0"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetFeature",
+                "Parameters": [
+                  {
+                    "Name": "Name",
+                    "Value": "AmbientDusk"
+                  },
+                  {
+                    "Name": "Enabled",
+                    "Value": "0"
+                  }
+                ]
+              },
+              "ControlCode": "power_off"
+            }
+          ]
+        },
+        {
+          "ControlType": "multi_state_button",
+          "Display": {
+            "Top": "120",
+            "Left": "120",
+            "Width": "50",
+            "Height": "20"
+          },
+          "states":[
+            {
+              "Label": {
+                "lang_tag": "ui7_cmd_on",
+                "text": "On"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "AmbientNight",
+                "Value": "1"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetFeature",
+                "Parameters": [
+                  {
+                    "Name": "Name",
+                    "Value": "AmbientNight"
+                  },
+                  {
+                    "Name": "Enabled",
+                    "Value": "1"
+                  }
+                ]
+              },
+              "ControlCode": "power_on"
+            },
+            {
+              "Label": {
+                "lang_tag": "ui7_cmd_off",
+                "text": "Off"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "AmbientNight",
+                "Value": "0"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetFeature",
+                "Parameters": [
+                  {
+                    "Name": "Name",
+                    "Value": "AmbientNight"
+                  },
+                  {
+                    "Name": "Enabled",
+                    "Value": "0"
+                  }
+                ]
+              },
+              "ControlCode": "power_off"
+            }
+          ]
+        },
+        {
+          "ControlType": "multi_state_button",
+          "Display": {
+            "Top": "180",
+            "Left": "120",
+            "Width": "50",
+            "Height": "20"
+          },
+          "states":[
+            {
+              "Label": {
+                "lang_tag": "ui7_cmd_on",
+                "text": "On"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "AmbientDawn",
+                "Value": "1"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetFeature",
+                "Parameters": [
+                  {
+                    "Name": "Name",
+                    "Value": "AmbientDawn"
+                  },
+                  {
+                    "Name": "Enabled",
+                    "Value": "1"
+                  }
+                ]
+              },
+              "ControlCode": "power_on"
+            },
+            {
+              "Label": {
+                "lang_tag": "ui7_cmd_off",
+                "text": "Off"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "AmbientDawn",
+                "Value": "0"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetFeature",
+                "Parameters": [
+                  {
+                    "Name": "Name",
+                    "Value": "AmbientDawn"
+                  },
+                  {
+                    "Name": "Enabled",
+                    "Value": "0"
+                  }
+                ]
+              },
+              "ControlCode": "power_off"
+            }
+          ]
+        },
+        {
+          "ControlType": "slider",
+          "Label": {
+            "lang_text": "dim_increment",
+            "text": "Dim Increment"
+          },
+          "Display": {
+            "Top": "255",
+            "Left": "120",
+            "Width": "300",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "DimIncrement",
+            "ID": "Increment",
+            "MinValue": 1,
+            "MaxValue": 100
+          },
+          "Command": {
+            "Service":"urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetIncrement",
+            "Parameters": [
+              {
+                "Name": "Increment",
+                "ID": "Increment"
+              }
+            ]
+          }
+        },
+        {
+          "ControlType": "slider",
+          "Label": {
+            "lang_text": "dim_increment",
+            "text": "Dim Up Minimum"
+          },
+          "Display": {
+            "Top": "315",
+            "Left": "120",
+            "Width": "300",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "DimUpMin",
+            "ID": "Min",
+            "MinValue": 1,
+            "MaxValue": 100
+          },
+          "Command": {
+            "Service":"urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetDimMin",
+            "Parameters": [
+              {
+                "Name": "Dim",
+                "ID": "Min"
+              }
+            ]
+          }
+        },
+        {
+          "ControlType": "button",
+          "Display": {
+            "Top": "375",
+            "Left": "120",
+            "Width": "50",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "LogLevel",
+            "Value": "debug"
+          },
+          "Label": {
+            "lang_text": "log_debug",
+            "text": "debug"
+          },
+          "Command": {
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetLogLevel",
+            "Parameters": [
+              {
+                "Name": "Level",
+                "Value": "debug"
+              }
+            ]
+          }
+        },
+        {
+          "ControlType": "button",
+          "Display": {
+            "Top": "360",
+            "Left": "190",
+            "Width": "50",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "LogLevel",
+            "Value": "info"
+          },
+          "Label": {
+            "lang_text": "log_info",
+            "text": "info"
+          },
+          "Command": {
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetLogLevel",
+            "Parameters": [
+              {
+                "Name": "Level",
+                "Value": "info"
+              }
+            ]
+          }
+        },
+        {
+          "ControlType": "button",
+          "Display": {
+            "Top": "360",
+            "Left": "250",
+            "Width": "50",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "LogLevel",
+            "Value": "warn"
+          },
+          "Label": {
+            "lang_text": "log_warn",
+            "text": "warn"
+          },
+          "Command": {
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetLogLevel",
+            "Parameters": [
+              {
+                "Name": "Level",
+                "Value": "warn"
+              }
+            ]
+          }
+        },
+        {
+          "ControlType": "button",
+          "Display": {
+            "Top": "360",
+            "Left": "310",
+            "Width": "50",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "LogLevel",
+            "Value": "error"
+          },
+          "Label": {
+            "lang_text": "log_debug",
+            "text": "error"
+          },
+          "Command": {
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetLogLevel",
+            "Parameters": [
+              {
+                "Name": "Level",
+                "Value": "error"
+              }
+            ]
+          }
         }
       ]
     },
@@ -251,7 +1057,7 @@
         "lang_tag": "advanced",
         "text": "Advanced"
       },
-      "Position": "6",
+      "Position": "3",
       "TabType": "javascript",
       "ScriptName": "shared.js",
       "Function": "advanced_device"
