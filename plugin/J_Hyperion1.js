@@ -40,8 +40,8 @@ function device_selection_callback(device_id) {
         if ( these_services.indexOf(hyperion.SID_SPOWER) >= 0 ||
              these_services.indexOf(hyperion.SID_DIMMING) >= 0 ) {
           valid = ( these_services.indexOf(hyperion.SID_HUEBULB) == -1 &&
-                   ! is_hyperion(this_id) &&
-                   these_services.indexOf(hyperion.VSWITCH == -1) );
+                    ! is_hyperion(this_id) &&
+                    these_services.indexOf(hyperion.SID_VSWITCH) == -1 );
         }
       }
     }
@@ -214,11 +214,17 @@ function is_hyperion(device_id) {
 }
 
 function add_device(device_id) {
-  var selected = $('#available_devices option:selected').selected();
-  console.log(JSON.stringify(selected));
+  $('#available_devices option:selected')
+    .selected()
+    .each(function(i, obj) {
+      console.log("#" + i + ' ' + JSON.stringify(obj));
+    });
 }
 
 function remove_device(device_id) {
-  var selected = $('#included_devices option:selected').selected();
-  console.log(JSON.stringify(selected));
+    $('#included_devices option:selected')
+    .selected()
+    .each(function(i, obj) {
+      console.log("#" + i + ' ' + JSON.stringify(obj));
+    });
 }
