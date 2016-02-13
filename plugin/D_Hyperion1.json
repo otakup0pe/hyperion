@@ -290,6 +290,15 @@
     },
     {
       "Label": {
+        "lang_text": "device_selection",
+        "text": "Device Selection"
+      },
+      "TabType": "javascript",
+      "ScriptName": "J_Hyperion1.js",
+      "Function": "device_selection_callback"
+    },
+    {
+      "Label": {
         "lang_text": "temp_tab",
         "text": "Color Temperature"
       },
@@ -939,7 +948,7 @@
         {
           "ControlType": "button",
           "Display": {
-            "Top": "375",
+            "Top": "360",
             "Left": "120",
             "Width": "50",
             "Height": "20",

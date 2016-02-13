@@ -149,7 +149,7 @@ function update_ambient(hyperion_id, lights)
    local is_night = luup.is_night();
    local op = nil
    log(hyperion_id, 'debug', "Time to sunset " .. time_to_sunset .. " Past dawn " .. tostring(past_dawn) .. " Time past sunrise " .. time_past_sunrise)
-   if cfg.ambient_dusk(hyperion_id) and ( (time_to_sunset >= 0 and (time_to_sunset <= sunset_grace)) or ((time_to_sunset > -120) and time_to_sunset <= 0 ) ) then
+   if cfg.ambient_dusk(hyperion_id) and ((time_to_sunset >= 0 and (time_to_sunset <= sunset_grace)) or ((time_to_sunset > -120) and time_to_sunset <= 0)) then
       op = 'dusk'
    elseif cfg.ambient_dawn(hyperion_id) and time_past_sunrise >= 0 and post_dawn and ( time_past_sunrise <= sunrise_grace ) then
       op = 'dawn'
