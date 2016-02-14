@@ -3,7 +3,7 @@ module("hyperion_util", package.seeall)
 local ez_vera = require("ez_vera")
 local const = require("vera_constants")
 
-local default_log_level = 'debug';
+local default_log_level = 'warn';
 
 function log(device_id, level, message)
    local c_level = cfg_get(device_id, 'LogLevel', default_log_level)

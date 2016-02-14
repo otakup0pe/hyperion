@@ -10,11 +10,11 @@ var hyperion = {
 
 function device_selection_callback(device_id) {
   var html = '';
-  html += '<h1>Devices controlled by Hyperion</h1>';
+  html += '<h1>Included Devices</h1>';
   html += render_device_selection(device_id, 'control');
-  html += '<h1>Devices that control Hyperion</h1>';
+  html += '<h1>Required Devices</h1>';
   html += render_device_selection(device_id, 'require');
-  html += '<h1>Devices to override Hyperion operation</h1>';
+  html += '<h1>Override Devices</h1>';
   html += render_device_selection(device_id, 'override');
   html += '<a href="https://github.com/otakup0pe/hyperion/wiki/Configuration#device-selection">Help</a>';
   set_panel_html(html);
