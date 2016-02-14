@@ -87,5 +87,19 @@
         return set_dim_min(lul_device, lul_settings.Dim)
       </run>
     </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>AddIncludedDevice</name>
+      <run>
+        return add_included_device(lul_device, lul_settings.Id, lul_settings.Type)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>RemoveIncludedDevice</name>
+      <run>
+        return remove_included_device(lul_device, lul_settings.Id, lul_settings.Type)
+      </run>
+    </action>
   </actionList>
 </implementation>

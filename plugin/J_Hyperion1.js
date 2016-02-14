@@ -10,24 +10,48 @@ var hyperion = {
 
 function device_selection_callback(device_id) {
   var html = '';
-  var device_ids = get_device_state(device_id, hyperion.SID_HYPERION, 'include_devices', 1).split(',');
-  var included_devices = device_ids.map(function(id) {
+  html += '<h1>Devices controlled by Hyperion</h1>';
+  html += render_device_selection(device_id, 'control');
+  html += '<h1>Devices that control Hyperion</h1>';
+  html += render_device_selection(device_id, 'require');
+  html += '<h1>Devices to override Hyperion operation</h1>';
+  html += render_device_selection(device_id, 'override');
+  html += '<a href="https://github.com/otakup0pe/hyperion/wiki/Configuration#device-selection">Help</a>';
+  set_panel_html(html);
+}
+
+function render_device_selection(device_id, device_type) {
+  var setting = '';
+  var callback = null;
+  var inactive_select = '';
+  var active_select = '';
+  if ( device_type == 'control') {
+    setting = 'include_devices';
+    callback = validate_control_device;
+  } else if ( device_type == 'require' ) {
+    setting = 'require_devices';
+    callback = validate_require_device;
+  } else if ( device_type == 'override' ) {
+    setting = 'override_devices';
+    callback = validate_override_device;
+  }
+  var selected_device_ids = get_device_state(device_id, hyperion.SID_HYPERION, setting, 1).split(',');
+  var selected_devices = selected_device_ids.map(function(id) {
     return {
       id: id,
       name: api.getRoomObject(api.getDeviceAttribute(id, 'room')).name + ' - ' + api.getDeviceAttribute(id, 'name')
     };
   });
-
-  html += '<table>';
-  html += '<tr><td>Available Devices</td><td></td><td>Included Devices</td>';
-  html += '<tr><td><select multiple size="10" id="available_devices">';
+  var html = '<table>';
+  html += '<tr><td>Available Devices</td><td></td><td>Selected Devices</td>';
+  html += '<tr><td><select multiple size="10" id="available_' + device_type + '_devices">';
   for ( var i_devices = 0; i_devices < jsonp.ud.devices.length ; i_devices++ ) {
     var this_device = jsonp.ud.devices[i_devices];
     var this_id = parseInt(this_device.id, 10);
     // check to see if it's an included device
     var valid = true;
-    for ( var i_check = 0 ; i_check < device_ids.length ; i_check++ ) {
-      if ( parseInt(device_ids[i_check], 10) == this_id ) {
+    for ( var i_check = 0 ; i_check < selected_device_ids.length ; i_check++ ) {
+      if ( parseInt(selected_device_ids[i_check], 10) == this_id ) {
         valid = false;
         break;
       }
@@ -37,12 +61,7 @@ function device_selection_callback(device_id) {
       valid = false;
       // check if it's a device we can use
       if ( these_services.length > 0 ) {
-        if ( these_services.indexOf(hyperion.SID_SPOWER) >= 0 ||
-             these_services.indexOf(hyperion.SID_DIMMING) >= 0 ) {
-          valid = ( these_services.indexOf(hyperion.SID_HUEBULB) == -1 &&
-                    ! is_hyperion(this_id) &&
-                    these_services.indexOf(hyperion.SID_VSWITCH) == -1 );
-        }
+        valid = callback(this_id, these_services);
       }
     }
     if ( valid ) {
@@ -56,15 +75,15 @@ function device_selection_callback(device_id) {
   }
   html += '</select></td>';
   html += '<td>';
-  html += '<button type="button" onclick="add_device(' + device_id + ')">--&gt;</button><br>';
-  html += '<button type="button" onclick="remove_device(' + device_id + ')">&lt;--</button>';
+  html += '<button type="button" onclick="add_device(' + device_id + ', \'' + device_type + '\')">--&gt;</button><br>';
+  html += '<button type="button" onclick="remove_device(' + device_id + ', \'' + device_type + '\')">&lt;--</button>';
   html += '</td>';
-  html += '<td><select multiple size="10" id="included_devices">';
-  for ( var i_idevices = 0 ; i_idevices < included_devices.length ; i_idevices++ ) {
-    html += '<option value="' + included_devices[i_idevices].id + '">' + included_devices[i_idevices].name + '</option>';
+  html += '<td><select multiple size="10" id="active_' + device_type + '_devices">';
+  for ( var i_idevices = 0 ; i_idevices < selected_devices.length ; i_idevices++ ) {
+    html += '<option value="' + selected_devices[i_idevices].id + '">' + selected_devices[i_idevices].name + '</option>';
   }
   html += '</select></td></tr></table>';
-  set_panel_html(html);
+  return html;
 }
 
 function time_settings_callback(device_id) {
@@ -98,7 +117,7 @@ function time_settings_callback(device_id) {
     }
     html += ' value="' + s_day_minute + '">' + s_day_minute + '</option>';
   }
-  html += '</select> with a pre-sunrise grace period of ';
+  html += '</select> with a dawn grace period of ';
   html += '<input id="sunrise_grace" type="text" onchange="save_grace(' + device_id + ', \'Sunrise\')" value="' + sunrise_grace + '" style="width: 100px"/> seconds.';
   html += "<p/>";
   var night_hour = get_device_state(device_id, hyperion.SID_HYPERION, 'NightHour', 1);
@@ -130,9 +149,9 @@ function time_settings_callback(device_id) {
     }
     html += ' value="' + s_night_minute + '">' + s_night_minute + '</option>';
   }
-  html += '</select> with a pre-sunset grace period of ';
+  html += '</select> with a dusk grace period of ';
   html += '<input id="sunset_grace" type="text" value="' + sunset_grace + '" onchange="save_grace(' + device_id + ', \'Sunset\');" style="width: 100px"/> seconds.';
-
+  html += '<a href="https://github.com/otakup0pe/hyperion/wiki/Configuration#time-settings">Help</a>';
   set_panel_html(html);
 }
 
@@ -213,18 +232,47 @@ function is_hyperion(device_id) {
   return false;
 }
 
-function add_device(device_id) {
-  $('#available_devices option:selected')
-    .selected()
+function add_device(device_id, device_type) {
+  var devices = $('#available_' + device_type + '_devices option:selected');
+  devices.selected()
     .each(function(i, obj) {
-      console.log("#" + i + ' ' + JSON.stringify(obj));
+      var action = {
+        'Id': obj.value,
+        'Type': device_type
+      };
+      call_action(device_id, hyperion.SID_HYPERION, 'AddIncludedDevice', action);
     });
+  devices.remove().appendTo('#active_' + device_type + '_devices').removeAttr('selected');
 }
 
-function remove_device(device_id) {
-    $('#included_devices option:selected')
-    .selected()
+function remove_device(device_id, device_type) {
+  var devices = $('#active_' + device_type + '_devices option:selected');
+  devices.selected()
     .each(function(i, obj) {
-      console.log("#" + i + ' ' + JSON.stringify(obj));
+      var action = {
+        'Id': obj.value,
+        'Type': device_type
+      };
+      call_action(device_id, hyperion.SID_HYPERION, 'RemoveIncludedDevice', action);
     });
+  devices.remove().appendTo('#available_' + device_type + '_devices').removeAttr('selected');
+}
+
+function validate_control_device(device_id, device_services) {
+  var valid = false;
+  if ( device_services.indexOf(hyperion.SID_SPOWER) >= 0 ||
+       device_services.indexOf(hyperion.SID_DIMMING) >= 0 ) {
+    valid = ( device_services.indexOf(hyperion.SID_HUEBULB) == -1 &&
+              ! is_hyperion(device_id) &&
+              device_services.indexOf(hyperion.SID_VSWITCH) == -1 );
+  }
+  return valid;
+}
+
+function validate_override_device(device_id, device_services) {
+  return device_services.indexOf(hyperion.SID_VSWITCH) >= 0;
+}
+
+function validate_require_device(device_id, device_services) {
+  return device_services.indexOf(hyperion.SID_VSWITCH) >= 0;
 }

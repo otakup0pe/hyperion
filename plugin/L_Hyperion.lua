@@ -274,3 +274,65 @@ function set_dim_min(lul_device, dim)
    hyperion_util.cfg_set(hyperion_id, 'DimUpMin', dim)
    return true
 end
+
+function add_included_device(lul_device, device_id, device_type)
+   local hyperion_id = tonumber(lul_device)
+   local setting = nil
+   if ( device_type == 'control' ) then
+      setting = 'include_devices'
+   elseif ( device_type == 'require' ) then
+      setting = 'require_devices'
+   elseif ( device_type == 'override' ) then
+      setting = 'override_devices'      
+   end
+   if ( setting == nil ) then
+      return false
+   end
+   local existing = hyperion_util.device_list(hyperion_id, setting)
+   local exists = false
+   for i, dev in _G.ipairs(existing) do
+      if ( device_id == dev ) then
+         exists = true
+         break
+      end
+   end
+   if ( not exists ) then
+      table.insert(existing, device_id)
+      hyperion_util.cfg_set(hyperion_id, setting, table.concat(existing, ','))
+   end
+   return true
+end
+
+function remove_included_device(lul_device, device_id, device_type)
+   local hyperion_id = tonumber(lul_device)
+   local setting = nil
+   if ( device_type == 'control' ) then
+      setting = 'include_devices'
+   elseif ( device_type == 'require' ) then
+      setting = 'require_devices';
+   elseif ( device_type == 'override' ) then
+      setting = 'override_devices';
+   end
+
+   if ( setting == nil ) then
+      return false
+   end
+   local existing = hyperion_util.device_list(hyperion_id, setting)
+   local exists = false
+   for i, dev in _G.ipairs(existing) do
+      if ( tonumber(device_id) == dev ) then
+         exists = true
+         break
+      end
+   end
+   if ( exists ) then
+      local new_value = {}
+      for i, dev in _G.ipairs(existing) do
+         if ( tonumber(device_id) ~= dev ) then
+            table.insert(new_value, dev)
+         end
+      end
+      hyperion_util.cfg_set(hyperion_id, setting, table.concat(new_value, ','))
+   end   
+   return true
+end

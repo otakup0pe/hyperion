@@ -112,7 +112,8 @@ function ambience_gate(hyperion_id)
       log(hyperion_id, 'info', "Ambience disabled by override")
       return false
    end
-   if ( not ez_vera.any_on(hyperion_util.device_list(hyperion_id, 'require_devices')) ) then
+   local require_devices = hyperion_util.device_list(hyperion_id, 'require_devices')
+   if ((table.getn(require_devices) > 0) and (not ez_vera.any_on(require_devices))) then
       log(hyperion_id, 'debug', 'Ambience disabled via lack of required switch')
       return false
    end

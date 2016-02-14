@@ -528,6 +528,19 @@
               }
             ]
           }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "temp_help",
+            "text": "<a href=\"https://github.com/otakup0pe/hyperion/wiki/Configuration#time-settings\">Help</a>"
+          },
+          "Display": {
+            "Top": "330",
+            "Left": "110",
+            "Width": "300",
+            "Height": "20"
+          }
         }
       ]
     },
@@ -623,7 +636,7 @@
             "text": "Log Level"
           },
           "Display": {
-            "Top": "375",
+            "Top": "360",
             "Left": "0",
             "Width": "60",
             "Height": "20"
@@ -1047,6 +1060,19 @@
                 "Value": "error"
               }
             ]
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "temp_help",
+            "text": "<a href=\"https://github.com/otakup0pe/hyperion/wiki/Configuration#features--configuration\">Help</a>"
+          },
+          "Display": {
+            "Top": "420",
+            "Left": "110",
+            "Width": "300",
+            "Height": "20"
           }
         }
       ]

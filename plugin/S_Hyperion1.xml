@@ -101,6 +101,19 @@
       </allowedValueRange>
     </stateVariable>
     <stateVariable sendEvents="no">
+      <name>A_ARG_TYPE_DeviceId</name>
+      <dataType>int</dataType>
+    </stateVariable>
+    <stateVariable sendEvents="no">
+      <name>A_ARG_TYPE_DeviceType</name>,
+      <dataType>string</dataType>
+      <allowedValueList>
+        <allowedValue>control</allowedValue>
+        <allowedValue>require</allowedValue>
+        <allowedValue>override</allowedValue>
+      </allowedValueList>
+    </stateVariable>
+    <stateVariable sendEvents="no">
       <name>LogLevel</name>
       <dataType>string</dataType>
       <defaultValue>debug</defaultValue>
@@ -384,6 +397,36 @@
           <relatedStateVariable>A_ARG_TYPE_Increment</relatedStateVariable>
         </argument>
       </argumentList>
-    </action>    
+    </action>
+    <action>
+      <name>AddIncludedDevice</name>
+      <argumentList>
+        <argument>
+          <name>Id</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_DeviceId</relatedStateVariable>
+        </argument>
+        <argument>
+          <name>Type</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_DeviceType</relatedStateVariable>
+        </argument>
+      </argumentList>
+    </action>
+    <action>
+      <name>RemoveIncludedDevice</name>
+      <argumentList>
+        <argument>
+          <name>Id</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_DeviceId</relatedStateVariable>
+        </argument>
+        <argument>
+          <name>Type</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_DeviceType</relatedStateVariable>
+        </argument>
+      </argumentList>
+    </action>
   </actionList>
 </scpd>
