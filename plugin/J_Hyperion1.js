@@ -37,9 +37,14 @@ function render_device_selection(device_id, device_type) {
   }
   var selected_device_ids = get_device_state(device_id, hyperion.SID_HYPERION, setting, 1).split(',');
   var selected_devices = selected_device_ids.map(function(id) {
+    var room = api.getRoomObject(api.getDeviceAttribute(id, 'room'));
+    var name = api.getDeviceAttribute(id, 'name');
+    if ( room && room.name ) {
+      name = room.name + ' - ' + name;
+    }
     return {
       id: id,
-      name: api.getRoomObject(api.getDeviceAttribute(id, 'room')).name + ' - ' + api.getDeviceAttribute(id, 'name')
+      name: name
     };
   });
   var html = '<table>';
@@ -47,6 +52,13 @@ function render_device_selection(device_id, device_type) {
   html += '<tr><td><select multiple size="10" id="available_' + device_type + '_devices">';
   for ( var i_devices = 0; i_devices < jsonp.ud.devices.length ; i_devices++ ) {
     var this_device = jsonp.ud.devices[i_devices];
+    var this_device_name;
+    if ( this_device.name ) {
+      this_device_name = this_device.name;
+    } else {
+      this_device_name = 'Device #' + this_device.id;
+    }
+    
     var this_id = parseInt(this_device.id, 10);
     // check to see if it's an included device
     var valid = true;
@@ -66,8 +78,8 @@ function render_device_selection(device_id, device_type) {
     }
     if ( valid ) {
       var room = api.getRoomObject(jsonp.ud.devices[i_devices].room);
-      var name = jsonp.ud.devices[i_devices].name;
-      if ( room ) {
+      var name = this_device_name;
+      if ( room && room.name ) {
         name = room.name + ' - ' + name;
       }
       html += '<option value="' + jsonp.ud.devices[i_devices].id + '">' + name + '</option>';
@@ -80,7 +92,13 @@ function render_device_selection(device_id, device_type) {
   html += '</td>';
   html += '<td><select multiple size="10" id="active_' + device_type + '_devices">';
   for ( var i_idevices = 0 ; i_idevices < selected_devices.length ; i_idevices++ ) {
-    html += '<option value="' + selected_devices[i_idevices].id + '">' + selected_devices[i_idevices].name + '</option>';
+    var selected_device_name;
+    if ( selected_devices[i_idevices].name ) {
+      selected_device_name = selected_devices[i_idevices].name;
+    } else {
+      selected_device_name = 'Device #' + selected_devices[i_idevices].id;
+    }
+    html += '<option value="' + selected_devices[i_idevices].id + '">' + selected_device_name + '</option>';
   }
   html += '</select></td></tr></table>';
   return html;
