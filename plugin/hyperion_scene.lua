@@ -3,6 +3,7 @@ local const = require("vera_constants")
 local ez_vera = require("ez_vera")
 local hyperion_util = require("hyperion_util")
 local cfg = require("hyperion_config")
+local hyperion_ambience = require("hyperion_ambience")
 
 function problem(message)
    luup.log("Hyperion Scene problem " .. message)
@@ -41,8 +42,10 @@ function dim_up(hyperion_id)
    local dim_increment = cfg.dim_increment(hyperion_id)
    local dim_up_min = cfg.dim_up_min(hyperion_id)      
    local child_id = hyperion_util.get_child(hyperion_id, 'dimmer')
-   local ambience_id = hyperion_util.get_child(hyperion_id, 'ambience')
-   ez_vera.switch_actuate(ambience_id, false)
+   if hyperion_ambience.operating_mode(hyperion_id) ~= 'night' then
+      local ambience_id = hyperion_util.get_child(hyperion_id, 'ambience')
+      ez_vera.switch_actuate(ambience_id, false)
+   end
    local current = ez_vera.dim_get(child_id)
    local dim
    if current == 0 then
