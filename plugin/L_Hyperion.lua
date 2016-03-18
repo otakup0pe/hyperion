@@ -3,12 +3,10 @@ local hyperion_ambience = require("hyperion_ambience")
 local const = require("vera_constants")
 local ez_vera = require("ez_vera")
 local log = hyperion_util.log
+local cfg = require("hyperion_config")
 
 function external_watch(lul_device, lul_service, lul_variable, lul_value_old, lul_value_new)
    local my_id = tonumber(lul_device)
-   if lul_variable ~= "Status" then
-      return
-   end
    for maybe_hyperion_id, params in pairs(luup.devices) do
       if luup.device_supports_service(const.SID_HYPERION, maybe_hyperion_id) then
          local update = false
@@ -24,7 +22,8 @@ function external_watch(lul_device, lul_service, lul_variable, lul_value_old, lu
                update = true
             end
          end
-         if update then
+         local mode = hyperion_util.house_mode()
+         if update and mode == const.HM_HOME then
             hyperion_ambience.update(maybe_hyperion_id)
          end
       end
@@ -37,33 +36,48 @@ function validate_device_list(hyperion_id, key)
       local device_id = tonumber(dev)
       if luup.devices[device_id] then
          if luup.device_supports_service(const.SID_VSWITCH, device_id) then
-            log(device_id, "debug", "Supported device " .. dev .. " found")
+            log(hyperion_id, "debug", "Supported Switch " .. dev .. " found")
             luup.variable_watch("external_watch", const.SID_VSWITCH, "Status", device_id)
             table.insert(valid_devs, device_id)
          elseif luup.device_supports_service(const.SID_SPOWER, device_id) then
-            log(device_id, "debug", "Supported device " .. dev .. " found")
+            log(hyperion_id, "debug", "Supported Switch " .. dev .. " found")
             luup.variable_watch("external_watch", const.SID_SPOWER, "Status", device_id)
             table.insert(valid_devs, device_id)
+         elseif luup.device_supports_service(const.SID_SSENSOR, device_id) then
+            log(hyperion_id, "debug", "Supported Security Sensor " .. dev .. " found")
+            luup.variable_watch("external_watch", const.SID_SSENSOR, "Tripped", device_id)
+            table.insert(valid_devs, device_id)
+         elseif luup.device_supports_service(const.SID_LSENSOR, device_id) then
+            log(hyperion_id, "debug", "Supported Light Sensor " .. dev .. " found")
+            luup.variable_watch("external_watch", const.SID_LSENSOR, "CurrentLevel", device_id)
+            table.insert(valid_devs, device_id)
+         elseif luup.device_supports_service(const.SID_WEATHER, device_id) then
+            log(hyperion_id, "debug", "Supported Weather Device " .. dev .. " found")
+            luup.variable_watch("external_watch", const.SID_WEATHER, "ConditionGroup", device_id)
+            table.insert(valid_devs, device_id)
          else
-            log(device_id, "warn", "Dropping unsupported device " .. dev)
+            log(hyperion_id, "warn", "Dropping unsupported device " .. dev)
          end
       else
-         log(device_id, "warn", "Dropping missing device " .. dev)
+         log(hyperion_id, "warn", "Dropping missing device " .. dev)
       end
    end
    local new_val = table.concat(valid_devs, ",")
    if ( val ~= new_val ) then
-      hyperion_util.cfg_set(hyperion_id, key, new_val)
+      cfg.set(hyperion_id, key, new_val)
    end
    log(hyperion_id, "info", "Validated " .. tonumber(table.getn(valid_devs)) .. " devices for " .. key)
 end
 
 function tick(lul_device)
    local hyperion_id = tonumber(lul_device)
-   log(hyperion_id, 'debug', "TICK")
-   hyperion_ambience.update(hyperion_id)
+   local mode = hyperion_util.house_mode()
+   log(hyperion_id, 'debug', "TICK " .. mode)
+   if mode == const.HM_HOME then
+      hyperion_ambience.update(hyperion_id)
+   end
    luup.call_timer("tick", 1, "60", "", hyperion_id)
-   hyperion_util.cfg_set(hyperion_id, "LastTick", os.time())
+   cfg.set(hyperion_id, "LastTick", os.time())
 end
 
 function ensure_children(hyperion_id)
@@ -131,11 +145,11 @@ end
 function do_switch(hyperion_id, target)
    local current_dim = hyperion_util.dim_get(hyperion_id)
    if current_dim > 0 and target == "0" then
-      hyperion_util.cfg_set(hyperion_id, 'LastDim', current_dim)
+      cfg.set(hyperion_id, 'LastDim', current_dim)
    end
    local val = "0"
    if target == "1" then
-      val = hyperion_util.cfg_get(hyperion_id, 'LastDim', "100")
+      val = cfg.get(hyperion_id, 'LastDim', "100")
    end
    local current_dim = hyperion_util.dim_get(hyperion_id)
    hyperion_util.dim_set(hyperion_id, val)
@@ -143,12 +157,12 @@ function do_switch(hyperion_id, target)
 end
 
 function do_ambience(hyperion_id, target)
-   hyperion_util.cfg_set(hyperion_id, 'Ambience', target)
+   cfg.set(hyperion_id, 'Ambience', target)
    ez_vera.switch_set(hyperion_util.get_child(hyperion_id, 'ambience'), target)
 end
 
 function do_temp(hyperion_id, target)
-   hyperion_util.cfg_set(hyperion_id, 'Preset', target)
+   cfg.set(hyperion_id, 'Preset', target)
    ez_vera.switch_set(hyperion_util.get_child(hyperion_id, 'temp'), target)
 end
 
@@ -201,14 +215,14 @@ end
 
 function cfg_set(lul_device, key, value)
    hyperion_id = tonumber(lul_device)
-   hyperion_util.cfg_set(hyperion_id, key, value)
+   cfg.set(hyperion_id, key, value)
    hyperion_ambience.update(hyperion_id)
    return true
 end
 
 function temp_set(lul_device, name, temp)
    local hyperion_id = tonumber(lul_device)
-   hyperion_util.cfg_set(hyperion_id, name, temp)
+   cfg.set(hyperion_id, name, temp)
    hyperion_ambience.update(hyperion_id)
    return true
 end
@@ -216,7 +230,7 @@ end
 function ambience_set(lul_device, enabled)
    local hyperion_id = tonumber(lul_device)
    local child_id = hyperion_util.get_child(hyperion_id, 'ambience')
-   hyperion_util.cfg_set(hyperion_id, 'Ambience', enabled)
+   cfg.set(hyperion_id, 'Ambience', enabled)
    ez_vera.switch_set(child_id, enabled)
    hyperion_ambience.update(hyperion_id)
    return true
@@ -224,35 +238,35 @@ end
 
 function feature_set(lul_device, name, enabled)
    local hyperion_id = tonumber(lul_device)
-   hyperion_util.cfg_set(hyperion_id, name, enabled)
+   cfg.set(hyperion_id, name, enabled)
    hyperion_ambience.update(hyperion_id)
    return true
 end
 
 function set_hour(lul_device, name, hour)
    local hyperion_id = tonumber(lul_device)
-   hyperion_util.cfg_set(hyperion_id, name .. 'Hour', hour)
+   cfg.set(hyperion_id, name .. 'Hour', hour)
    hyperion_ambience.update(hyperion_id)
    return true
 end
 
 function set_minute(lul_device, name, minute)
    local hyperion_id = tonumber(lul_device)
-   hyperion_util.cfg_set(hyperion_id, name .. 'Minute', minute)
+   cfg.set(hyperion_id, name .. 'Minute', minute)
    hyperion_ambience.update(hyperion_id)
    return true
 end
 
-function set_grace(lul_device, name, time)
+function set_timeout(lul_device, name, time)
    local hyperion_id = tonumber(lul_device)
-   hyperion_util.cfg_set(hyperion_id, name .. 'Grace', time)
+   cfg.set(hyperion_id, name, time)
    hyperion_ambience.update(hyperion_id)
    return true
 end
 
 function set_preset(lul_device, preset)
    local hyperion_id = tonumber(lul_device)
-   hyperion_util.cfg_set(hyperion_id, 'Preset', preset)
+   cfg.set(hyperion_id, 'Preset', preset)
    hyperion_ambience.update(hyperion_id)
    local child_id = hyperion_util.get_child(hyperion_id, 'temp')
    if preset == "1" then
@@ -265,13 +279,19 @@ end
 
 function set_increment(lul_device, increment)
    local hyperion_id = tonumber(lul_device)
-   hyperion_util.cfg_set(hyperion_id, 'DimIncrement', increment)
+   cfg.set(hyperion_id, 'DimIncrement', increment)
    return true
 end
 
 function set_dim_min(lul_device, dim)
    local hyperion_id = tonumber(lul_device)
-   hyperion_util.cfg_set(hyperion_id, 'DimUpMin', dim)
+   cfg.set(hyperion_id, 'DimUpMin', dim)
+   return true
+end
+
+function set_lux_threshold(lul_device, threshold)
+   local hyperion_id = tonumber(lul_device)
+   cfg.set(hyperion_id, 'LuxThreshold', threshold)
    return true
 end
 
@@ -298,7 +318,7 @@ function add_included_device(lul_device, device_id, device_type)
    end
    if ( not exists ) then
       table.insert(existing, device_id)
-      hyperion_util.cfg_set(hyperion_id, setting, table.concat(existing, ','))
+      cfg.set(hyperion_id, setting, table.concat(existing, ','))
    end
    return true
 end
@@ -332,7 +352,7 @@ function remove_included_device(lul_device, device_id, device_type)
             table.insert(new_value, dev)
          end
       end
-      hyperion_util.cfg_set(hyperion_id, setting, table.concat(new_value, ','))
+      cfg.set(hyperion_id, setting, table.concat(new_value, ','))
    end   
    return true
 end

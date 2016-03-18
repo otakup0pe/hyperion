@@ -4,6 +4,7 @@ local ez_vera = require("ez_vera")
 local hyperion_util = require("hyperion_util")
 local log = hyperion_util.log
 local cfg = require("hyperion_config")
+local const = require("vera_constants")
 
 function dawn_ambience(hyperion_id, device_id)
    log(hyperion_id, "debug", "Dawn Ambience")
@@ -14,11 +15,11 @@ function dawn_ambience(hyperion_id, device_id)
    local sunrise_grace = cfg.sunrise_grace(hyperion_id)
    local now = os.time()
    local morning_secs =  os.time{day=os.date("%d", now),
-                               month=os.date("%m", now),
-                               year=os.date("%Y", now),
-                               hour=morning_hour,
-                               min=morning_minute,
-                               sec=00}
+                                 month=os.date("%m", now),
+                                 year=os.date("%Y", now),
+                                 hour=morning_hour,
+                                 min=morning_minute,
+                                 sec=00}
    local sunrise = luup.sunrise()
    local dim = 0
    if luup.is_night() then
@@ -113,9 +114,11 @@ function ambience_gate(hyperion_id)
       return false
    end
    local require_devices = hyperion_util.device_list(hyperion_id, 'require_devices')
-   if ((table.getn(require_devices) > 0) and (not ez_vera.any_on(require_devices))) then
-      log(hyperion_id, 'debug', 'Ambience disabled via lack of required switch')
-      return false
+   if (table.getn(require_devices) > 0) then
+      if not ez_vera.any_on(require_devices) then
+         log(hyperion_id, 'debug', 'Ambience disabled via lack of required switch')
+         return false
+      end
    end
    return true
 end
@@ -136,35 +139,115 @@ function dim_group(hyperion_id, lights, cb)
    end
 end
 
-function update_ambient(hyperion_id, lights)
+function time_past_sunrise()
+   local now = os.time()
+   return now - (luup.sunrise() - 86400)
+end
+
+function is_dusk(hyperion_id)
    local sunset_grace = cfg.sunset_grace(hyperion_id)
-   local sunrise_grace = cfg.sunrise_grace(hyperion_id)
+   local now = os.time()
+   local time_to_sunset = 0 - (now - luup.sunset())
+   log(hyperion_id, 'debug', "to sunset " .. time_to_sunset)
+   return ((time_to_sunset >= 0 and (time_to_sunset <= sunset_grace)) or ((time_to_sunset > -120) and time_to_sunset <= 0))
+end
+
+function is_dawn(hyperion_id)
    local morning_hour = cfg.morning_hour(hyperion_id)
    local morning_minute = cfg.morning_minute(hyperion_id)
-   local day_temp = cfg.day_temp(hyperion_id)
+   local sunrise_grace = cfg.sunrise_grace(hyperion_id)
+   local now = os.time()
+   local time_past_sunrise = time_past_sunrise()
+   local past_dawn = tonumber(os.date("%H", now)) >= morning_hour and tonumber(os.date("%M", now)) >= morning_minute;
+   log(hyperion_id, 'debug', 'Past dawn ' .. tostring(past_dawn) .. " past sunrise " .. time_past_sunrise)
+   return time_past_sunrise >= 0 and past_dawn and ( time_past_sunrise <= sunrise_grace )
+end
+
+function operating_mode(hyperion_id)
    local evening_temp = cfg.evening_temp(hyperion_id)
    local now = os.time()
    local time_to_sunset = 0 - (now - luup.sunset())
    local time_past_sunrise = now - (luup.sunrise() - 86400)
-   local past_dawn = tonumber(os.date("%H", now)) >= morning_hour and tonumber(os.date("%M", now)) >= morning_minute;
    local is_night = luup.is_night();
    local op = nil
-   log(hyperion_id, 'debug', "Time to sunset " .. time_to_sunset .. " Past dawn " .. tostring(past_dawn) .. " Time past sunrise " .. time_past_sunrise)
-   if cfg.ambient_dusk(hyperion_id) and ((time_to_sunset >= 0 and (time_to_sunset <= sunset_grace)) or ((time_to_sunset > -120) and time_to_sunset <= 0)) then
+   if cfg.ambient_dusk(hyperion_id) and is_dusk(hyperion_id) then
       op = 'dusk'
-   elseif cfg.ambient_dawn(hyperion_id) and time_past_sunrise >= 0 and post_dawn and ( time_past_sunrise <= sunrise_grace ) then
+   elseif cfg.ambient_dawn(hyperion_id) and is_dawn(hyperion_id) then
       op = 'dawn'
    elseif cfg.ambient_night(hyperion_id) and is_night then
       op = 'night'
    elseif cfg.ambient_day(hyperion_id) then
       op = 'day'
    end
+   return op
+end
+
+function dim_based_on_inactivity(hyperion_id, dim)
+   local sensors = hyperion_util.get_sensors(hyperion_id, const.SID_SSENSOR)
+   if table.getn(sensors) > 0 then
+      if not hyperion_util.any_tripped(sensors) then
+         if cfg.inactive_dim(hyperion_id) then
+            dim = math.floor(dim / 2)
+            if dim <= 0 then
+               dim = 1
+            end
+            log(hyperion_id, 'debug', 'Dimming due to inaction')
+         else
+            log(hyperion_id, 'debug', 'Turning off due to inaction')
+            dim = 0
+         end
+      end
+   end
+   return dim
+end
+
+function stormy_weather(hyperion_id)
+   local require_devices = hyperion_util.device_list(hyperion_id, 'require_devices')
+   if table.getn(require_devices) > 0 then
+      for i, device_id in _G.ipairs(require_devices) do
+         if luup.device_supports_service(const.SID_WEATHER) then
+            local condition = hyperion_util.weather_condition(device_id)
+            log(hyperion_id, 'debug', 'Weather ' .. device_id .. ' condition group ' .. condition)
+            if condition == "cloudy" or condition == "fog" or condition == "rain" then
+               return true
+            end
+         end
+      end
+   end
+   return false
+end
+
+function dim_room(hyperion_id)
+   local sensors = hyperion_util.get_sensors(hyperion_id, const.SID_LSENSOR)
+   if table.getn(sensors) > 0 then
+      for i, device_id in _G.ipairs(sensors) do
+         local lux_str = luup.variable_get(const.SID_LSENSOR, 'CurrentLevel', device_id)
+         log(hyperion_id, 'debug', 'LightSensor ' .. tostring(device_id) .. ' CurrentLevel ' .. lux_str)
+         local lux = tonumber(lux_str)
+         if lux == nil then
+            return false
+         else
+            local lux_threshold = cfg.lux_threshold()
+            log(hyperion_id, 'debug', 'LightSensor ' .. tostring(device_id) .. ' under threshold of ' .. tostring(lux_threshold))
+            if lux <= lux_threshold then
+               return true
+            end
+         end
+      end
+   end
+   return false
+end
+
+function update_ambient(hyperion_id, lights)
+   local op = operating_mode(hyperion_id)
    local dim = hyperion_util.dim_get(hyperion_id)
+   local day_temp = cfg.day_temp(hyperion_id)
    local cb = function(hyperion_id, device_id)
       if ( op == 'night' ) then
          if ( ez_vera.is_hue(device_id) ) then
             night_ambience(hyperion_id, device_id)
          end
+         dim = dim_based_on_inactivity(hyperion_id, dim)
          ez_vera.dim_actuate(device_id, dim)
       elseif ( op == 'dusk' ) then
          dusk_ambience(hyperion_id, device_id)
@@ -173,17 +256,17 @@ function update_ambient(hyperion_id, lights)
          end
       elseif op == 'day' then
          log(hyperion_id, "debug", "Daytime Ambience")
-         local condition =  hyperion_util.weather_condition(hyperion_id)
-         if condition == "cloudy" or
-            condition == "fog" or
-         condition == "rain" then
-            ez_vera.dim_actuate(device_id, dim)
-            if ( ez_vera.is_hue(device_id) ) then
-               ez_vera.hue_temp(device_id + 1, day_temp)
-            end
-         else
-            ez_vera.switch_actuate(device_id, false)
+         local day_dim = 0
+         if stormy_weather(hyperion_id) then
+            day_dim = dim
          end
+         if dim_room(hyperion_id) then
+            day_dim = dim_based_on_inactivity(hyperion_id, dim)
+         end
+         if day_dim > 0 and ez_vera.is_hue(device_id) then
+            ez_vera.hue_temp(device_id + 1, day_temp)
+         end
+         ez_vera.dim_actuate(device_id, day_dim)
       elseif op == 'dawn' then
          dawn_ambience(hyperion_id, device_id)
       end

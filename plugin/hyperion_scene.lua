@@ -5,7 +5,7 @@ local hyperion_util = require("hyperion_util")
 local cfg = require("hyperion_config")
 
 function problem(message)
-   luup.log("hyperion_scene problem " .. message)
+   luup.log("Hyperion Scene problem " .. message)
 end
 
 function dim_down(hyperion_id)
@@ -23,7 +23,7 @@ function dim_down(hyperion_id)
    if current - dim_increment > 0 then
       dim = current - dim_increment
    elseif current == 0 then
-      dim = hyperion_util.cfg_get(hyperion_id, 'LastDim', '100')
+      dim = cfg.get(hyperion_id, 'LastDim', '100')
    else
       dim = 0
    end
@@ -41,10 +41,12 @@ function dim_up(hyperion_id)
    local dim_increment = cfg.dim_increment(hyperion_id)
    local dim_up_min = cfg.dim_up_min(hyperion_id)      
    local child_id = hyperion_util.get_child(hyperion_id, 'dimmer')
+   local ambience_id = hyperion_util.get_child(hyperion_id, 'ambience')
+   ez_vera.switch_actuate(ambience_id, false)
    local current = ez_vera.dim_get(child_id)
    local dim
    if current == 0 then
-      local last = tonumber(hyperion_util.cfg_get(hyperion_id, 'LastDim', '100'))
+      local last = tonumber(cfg.get(hyperion_id, 'LastDim', '100'))
       if last >= dim_up_min then
          dim = last
       else

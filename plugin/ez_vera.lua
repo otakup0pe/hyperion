@@ -99,9 +99,12 @@ end
 function any_on(devices)
    local active = false
    for i, switch in _G.ipairs(devices) do
-      if ( switch_get(switch) ) then
-         active = true
-         break
+      if luup.device_supports_service(const.SID_VSWITCH, device_id) or
+         luup.device_supports_service(const.SID_SPOWER, device_id) then
+            if ( switch_get(switch) ) then
+               active = true
+               break
+            end
       end
    end
    return active
@@ -122,4 +125,10 @@ end
 
 function dim_actuate(device_id, dim)
    luup.call_action(const.SID_DIMMABLE, "SetLoadLevelTarget", {newLoadlevelTarget = dim}, device_id)
+end
+
+function sonos_favorite(device_id, favorite, volume)
+   luup.call_action("urn:micasaverde-com:serviceId:Sonos1", "PlayURI",
+                    {URIToPlay="SF:" .. favorite, Volume=volume},
+                    device_id)
 end

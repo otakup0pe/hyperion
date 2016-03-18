@@ -61,9 +61,9 @@
     </action>
     <action>
       <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
-      <name>SetGrace</name>
+      <name>SetTimeout</name>
       <run>
-        return set_grace(lul_device, lul_settings.Name, lul_settings.Time)
+        return set_timeout(lul_device, lul_settings.Name, lul_settings.Time)
       </run>
     </action>
     <action>
@@ -85,6 +85,13 @@
       <name>SetDimMin</name>
       <run>
         return set_dim_min(lul_device, lul_settings.Dim)
+      </run>
+    </action>
+    <action>
+      <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
+      <name>SetLuxThreshold</name>
+      <run>
+        return set_lux_threshold(lul_device, lul_settings.Threshold)
       </run>
     </action>
     <action>

@@ -606,11 +606,24 @@
         {
           "ControlType": "label",
           "Label": {
-            "lang_text": "dim_increment",
-            "text": "Dimming Increment"
+            "lang_text": "dim_inactivity",
+            "text": "Dim on Inactivity"
           },
           "Display": {
             "Top": "255",
+            "Left": "0",
+            "Width": "60",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "inactive_time",
+            "text": "Inactivity Time"
+          },
+          "Display": {
+            "Top": "315",
             "Left": "0",
             "Width": "60",
             "Height": "20"
@@ -623,7 +636,20 @@
             "text": "Min Brightness"
           },
           "Display": {
-            "Top": "315",
+            "Top": "375",
+            "Left": "0",
+            "Width": "60",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "lux_threshold",
+            "text": "Low Light Threshold"
+          },
+          "Display": {
+            "Top": "435",
             "Left": "0",
             "Width": "60",
             "Height": "20"
@@ -636,7 +662,7 @@
             "text": "Log Level"
           },
           "Display": {
-            "Top": "360",
+            "Top": "495",
             "Left": "0",
             "Width": "60",
             "Height": "20"
@@ -903,13 +929,110 @@
           ]
         },
         {
+          "ControlType": "multi_state_button",
+          "Display": {
+            "Top": "255",
+            "Left": "120",
+            "Width": "50",
+            "Height": "20"
+          },
+          "states":[
+            {
+              "Label": {
+                "lang_tag": "ui7_cmd_on",
+                "text": "On"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "InactiveDim",
+                "Value": "1"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetFeature",
+                "Parameters": [
+                  {
+                    "Name": "Name",
+                    "Value": "InactiveDim"
+                  },
+                  {
+                    "Name": "Enabled",
+                    "Value": "1"
+                  }
+                ]
+              },
+              "ControlCode": "power_on"
+            },
+            {
+              "Label": {
+                "lang_tag": "ui7_cmd_off",
+                "text": "Off"
+              },
+              "ControlGroup": "1",
+              "Display": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Variable": "InactiveDim",
+                "Value": "30"
+              },
+              "Command": {
+                "Service": "urn:otakup0pe:serviceId:Hyperion1",
+                "Action": "SetFeature",
+                "Parameters": [
+                  {
+                    "Name": "Name",
+                    "Value": "InactiveDim"
+                  },
+                  {
+                    "Name": "Enabled",
+                    "Value": "0"
+                  }
+                ]
+              },
+              "ControlCode": "power_off"
+            }
+          ]
+        },
+        {
+          "ControlType": "slider",
+          "Label": {
+            "lang_text": "night_temp",
+            "text": "Night"
+          },
+          "Display": {
+            "Top": "315",
+            "Left": "120",
+            "Width": "300",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "MotionTimeout",
+            "ID": "MotionTimeout",
+            "MinValue": 0,
+            "MaxValue": 10800
+          },
+          "Command": {
+            "Service":"urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetTimeout",
+            "Parameters": [
+              {
+                "Name": "Name",
+                "Value": "Inactive"
+              },
+              {
+                "Name": "Length",
+                "ID": "MotionTimeout"
+              }
+            ]
+          }
+        },
+        {
           "ControlType": "slider",
           "Label": {
             "lang_text": "dim_increment",
             "text": "Dim Increment"
           },
           "Display": {
-            "Top": "255",
+            "Top": "365",
             "Left": "120",
             "Width": "300",
             "Height": "20",
@@ -937,7 +1060,7 @@
             "text": "Dim Up Minimum"
           },
           "Display": {
-            "Top": "315",
+            "Top": "420",
             "Left": "120",
             "Width": "300",
             "Height": "20",
@@ -959,9 +1082,37 @@
           }
         },
         {
+          "ControlType": "slider",
+          "Label": {
+            "lang_text": "lux_threshold",
+            "text": "Lux Threshold"
+          },
+          "Display": {
+            "Top": "470",
+            "Left": "120",
+            "Width": "300",
+            "Height": "20",
+            "Service": "urn:otakup0pe:serviceId:Hyperion1",
+            "Variable": "LuxThreshold",
+            "ID": "LuxThreshold",
+            "MinValue": 1,
+            "MaxValue": 100
+          },
+          "Command": {
+            "Service":"urn:otakup0pe:serviceId:Hyperion1",
+            "Action": "SetLuxThreshold",
+            "Parameters": [
+              {
+                "Name": "Threshold",
+                "ID": "LuxThreshold"
+              }
+            ]
+          }
+        },
+        {
           "ControlType": "button",
           "Display": {
-            "Top": "360",
+            "Top": "490",
             "Left": "120",
             "Width": "50",
             "Height": "20",
@@ -987,7 +1138,7 @@
         {
           "ControlType": "button",
           "Display": {
-            "Top": "360",
+            "Top": "490",
             "Left": "190",
             "Width": "50",
             "Height": "20",
@@ -1013,7 +1164,7 @@
         {
           "ControlType": "button",
           "Display": {
-            "Top": "360",
+            "Top": "490",
             "Left": "250",
             "Width": "50",
             "Height": "20",
@@ -1039,7 +1190,7 @@
         {
           "ControlType": "button",
           "Display": {
-            "Top": "360",
+            "Top": "490",
             "Left": "310",
             "Width": "50",
             "Height": "20",
@@ -1069,7 +1220,7 @@
             "text": "<a href=\"https://github.com/otakup0pe/hyperion/wiki/Configuration#features--configuration\">Help</a>"
           },
           "Display": {
-            "Top": "420",
+            "Top": "530",
             "Left": "110",
             "Width": "300",
             "Height": "20"

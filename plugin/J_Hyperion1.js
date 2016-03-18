@@ -5,7 +5,10 @@ var hyperion = {
   SID_SPOWER: "urn:upnp-org:serviceId:SwitchPower1",
   SID_DIMMING: "urn:upnp-org:serviceId:Dimming1",
   SID_HUEBULB: "urn:intvelt-com:serviceId:HueColors1",
-  SID_VSWITCH: "urn:upnp-org:serviceId:VSwitch1"
+  SID_VSWITCH: "urn:upnp-org:serviceId:VSwitch1",
+  SID_SSENSOR: "urn:micasaverde-com:serviceId:SecuritySensor1",
+  SID_LSENSOR: "urn:micasaverde-com:serviceId:LightSensor1",
+  SID_WEATHER: "urn:upnp-micasaverde-com:serviceId:Weather1"
 };
 
 function device_selection_callback(device_id) {
@@ -202,14 +205,14 @@ function save_minute(device_id, name)
 function save_grace(device_id, name)
 {
   var obj = {
-    'Name': name
+    'Name': name + 'Grace'
   };
   if ( name == 'Sunrise' ) {
     obj.Time = jQuery('#sunrise_grace').val();
   } else {
     obj.Time = jQuery('#sunset_grace').val();
   }
-  call_action(device_id, hyperion.SID_HYPERION, 'SetGrace', obj);
+  call_action(device_id, hyperion.SID_HYPERION, 'SetTimeout', obj);
 }
 
 function call_action(device_id, sid, action, args) {
@@ -292,5 +295,8 @@ function validate_override_device(device_id, device_services) {
 }
 
 function validate_require_device(device_id, device_services) {
-  return device_services.indexOf(hyperion.SID_VSWITCH) >= 0;
+  return device_services.indexOf(hyperion.SID_VSWITCH) >= 0 ||
+    device_services.indexOf(hyperion.SID_SSENSOR) >= 0 ||
+    device_services.indexOf(hyperion.SID_WEATHER) >= 0 ||
+    device_services.indexOf(hyperion.SID_LSENSOR) >= 0;
 }

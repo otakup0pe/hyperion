@@ -35,11 +35,12 @@
       </allowedValueList>
     </stateVariable>
     <stateVariable sendEvents="no">
-      <name>A_ARG_TYPE_GraceName</name>,
+      <name>A_ARG_TYPE_TimeoutName</name>,
       <dataType>string</dataType>
       <allowedValueList>
         <allowedValue>Sunrise</allowedValue>
         <allowedValue>Sunset</allowedValue>
+        <allowedValue>Inactive</allowedValue>
       </allowedValueList>
     </stateVariable>
     <stateVariable sendEvents="no">
@@ -50,6 +51,7 @@
         <allowedValue>AmbientDusk</allowedValue>
         <allowedValue>AmbientNight</allowedValue>
         <allowedValue>AmbientDawn</allowedValue>
+        <allowedValue>InactiveDim</allowedValue>
       </allowedValueList>
     </stateVariable>
     <stateVariable sendEvents="no">
@@ -61,7 +63,7 @@
       </allowedValueRange>
     </stateVariable>
     <stateVariable sendEvents="no">
-      <name>A_ARG_TYPE_GraceTime</name>,
+      <name>A_ARG_TYPE_TimeoutTime</name>,
       <dataType>int</dataType>
       <allowedValueRange>
         <minimum>0</minimum>
@@ -354,12 +356,12 @@
       </argumentList>
     </action>
     <action>
-      <name>SetGrace</name>
+      <name>SetTimeout</name>
       <argumentList>
         <argument>
           <name>Name</name>
           <direction>in</direction>
-          <relatedStateVariable>A_ARG_TYPE_GraceName</relatedStateVariable>
+          <relatedStateVariable>A_ARG_TYPE_TimeoutName</relatedStateVariable>
         </argument>
         <argument>
           <name>Length</name>
@@ -393,6 +395,16 @@
       <argumentList>
         <argument>
           <name>Dim</name>
+          <direction>in</direction>
+          <relatedStateVariable>A_ARG_TYPE_Increment</relatedStateVariable>
+        </argument>
+      </argumentList>
+    </action>
+    <action>
+      <name>SetLuxThreshold</name>
+      <argumentList>
+        <argument>
+          <name>Threshold</name>
           <direction>in</direction>
           <relatedStateVariable>A_ARG_TYPE_Increment</relatedStateVariable>
         </argument>
