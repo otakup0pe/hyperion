@@ -45,7 +45,7 @@ function dusk_ambience(hyperion_id, device_id)
    local dusk_remaining = sunset - now
    local dusk_percent
    if dusk_remaining <= sunset_grace then
-      dusk_percent = (dusk_remaining / sunset_grace) * 100
+      dusk_percent = 100 - ((dusk_remaining / sunset_grace) * 100)
    else
       dusk_percent = 100
    end
@@ -228,8 +228,8 @@ function dim_room(hyperion_id)
             return false
          else
             local lux_threshold = cfg.lux_threshold()
-            log(hyperion_id, 'debug', 'LightSensor ' .. tostring(device_id) .. ' under threshold of ' .. tostring(lux_threshold))
             if lux <= lux_threshold then
+               log(hyperion_id, 'debug', 'LightSensor ' .. tostring(device_id) .. ' under threshold of ' .. tostring(lux_threshold))
                return true
             end
          end

@@ -558,7 +558,7 @@
             "text": "Daylight Ambience"
           },
           "Display": {
-            "Top": "15",
+            "Top": "10",
             "Left": "0",
             "Width": "60",
             "Height": "20"
@@ -571,7 +571,7 @@
             "text": "Dusk Ambience"
           },
           "Display": {
-            "Top": "75",
+            "Top": "70",
             "Left": "0",
             "Width": "60",
             "Height": "20"
@@ -584,7 +584,7 @@
             "text": "Nighttime Ambience"
           },
           "Display": {
-            "Top": "135",
+            "Top": "130",
             "Left": "0",
             "Width": "60",
             "Height": "20"
@@ -597,7 +597,7 @@
             "text": "Dawn Ambience"
           },
           "Display": {
-            "Top": "195",
+            "Top": "190",
             "Left": "0",
             "Width": "60",
             "Height": "20"
@@ -610,7 +610,7 @@
             "text": "Dim on Inactivity"
           },
           "Display": {
-            "Top": "255",
+            "Top": "250",
             "Left": "0",
             "Width": "60",
             "Height": "20"
@@ -620,10 +620,23 @@
           "ControlType": "label",
           "Label": {
             "lang_text": "inactive_time",
-            "text": "Inactivity Time"
+            "text": "Inactivity Threshold"
           },
           "Display": {
-            "Top": "315",
+            "Top": "295",
+            "Left": "0",
+            "Width": "60",
+            "Height": "20"
+          }
+        },
+        {
+          "ControlType": "label",
+          "Label": {
+            "lang_text": "dim_inc",
+            "text": "Dimming Increment"
+          },
+          "Display": {
+            "Top": "335",
             "Left": "0",
             "Width": "60",
             "Height": "20"
@@ -649,7 +662,7 @@
             "text": "Low Light Threshold"
           },
           "Display": {
-            "Top": "435",
+            "Top": "415",
             "Left": "0",
             "Width": "60",
             "Height": "20"
@@ -662,7 +675,7 @@
             "text": "Log Level"
           },
           "Display": {
-            "Top": "495",
+            "Top": "450",
             "Left": "0",
             "Width": "60",
             "Height": "20"
@@ -931,7 +944,7 @@
         {
           "ControlType": "multi_state_button",
           "Display": {
-            "Top": "255",
+            "Top": "240",
             "Left": "120",
             "Width": "50",
             "Height": "20"
@@ -973,7 +986,7 @@
               "Display": {
                 "Service": "urn:otakup0pe:serviceId:Hyperion1",
                 "Variable": "InactiveDim",
-                "Value": "30"
+                "Value": "0"
               },
               "Command": {
                 "Service": "urn:otakup0pe:serviceId:Hyperion1",
@@ -1000,7 +1013,7 @@
             "text": "Night"
           },
           "Display": {
-            "Top": "315",
+            "Top": "300",
             "Left": "120",
             "Width": "300",
             "Height": "20",
@@ -1016,7 +1029,7 @@
             "Parameters": [
               {
                 "Name": "Name",
-                "Value": "Inactive"
+                "Value": "MotionTimeout"
               },
               {
                 "Name": "Length",
@@ -1032,7 +1045,7 @@
             "text": "Dim Increment"
           },
           "Display": {
-            "Top": "365",
+            "Top": "340",
             "Left": "120",
             "Width": "300",
             "Height": "20",
@@ -1060,7 +1073,7 @@
             "text": "Dim Up Minimum"
           },
           "Display": {
-            "Top": "420",
+            "Top": "380",
             "Left": "120",
             "Width": "300",
             "Height": "20",
@@ -1088,7 +1101,7 @@
             "text": "Lux Threshold"
           },
           "Display": {
-            "Top": "470",
+            "Top": "420",
             "Left": "120",
             "Width": "300",
             "Height": "20",
@@ -1112,7 +1125,7 @@
         {
           "ControlType": "button",
           "Display": {
-            "Top": "490",
+            "Top": "460",
             "Left": "120",
             "Width": "50",
             "Height": "20",
@@ -1138,7 +1151,7 @@
         {
           "ControlType": "button",
           "Display": {
-            "Top": "490",
+            "Top": "460",
             "Left": "190",
             "Width": "50",
             "Height": "20",
@@ -1164,7 +1177,7 @@
         {
           "ControlType": "button",
           "Display": {
-            "Top": "490",
+            "Top": "460",
             "Left": "250",
             "Width": "50",
             "Height": "20",
@@ -1190,7 +1203,7 @@
         {
           "ControlType": "button",
           "Display": {
-            "Top": "490",
+            "Top": "460",
             "Left": "310",
             "Width": "50",
             "Height": "20",
@@ -1220,7 +1233,7 @@
             "text": "<a href=\"https://github.com/otakup0pe/hyperion/wiki/Configuration#features--configuration\">Help</a>"
           },
           "Display": {
-            "Top": "530",
+            "Top": "480",
             "Left": "110",
             "Width": "300",
             "Height": "20"

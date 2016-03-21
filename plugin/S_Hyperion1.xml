@@ -38,9 +38,9 @@
       <name>A_ARG_TYPE_TimeoutName</name>,
       <dataType>string</dataType>
       <allowedValueList>
-        <allowedValue>Sunrise</allowedValue>
-        <allowedValue>Sunset</allowedValue>
-        <allowedValue>Inactive</allowedValue>
+        <allowedValue>SunriseGrace</allowedValue>
+        <allowedValue>SunsetGrace</allowedValue>
+        <allowedValue>MotionTimeout</allowedValue>
       </allowedValueList>
     </stateVariable>
     <stateVariable sendEvents="no">

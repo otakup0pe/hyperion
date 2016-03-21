@@ -5,7 +5,7 @@ local const = require('vera_constants')
 
 function get(device_id, key, default)
    local val = luup.variable_get(const.SID_HYPERION, key, device_id)
-   if val then
+   if val ~= nil then
       return val
    else
       set(device_id, key, default)

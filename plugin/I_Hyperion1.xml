@@ -63,7 +63,7 @@
       <serviceId>urn:otakup0pe:serviceId:Hyperion1</serviceId>
       <name>SetTimeout</name>
       <run>
-        return set_timeout(lul_device, lul_settings.Name, lul_settings.Time)
+        return set_timeout(lul_device, lul_settings.Name, lul_settings.Length)
       </run>
     </action>
     <action>
