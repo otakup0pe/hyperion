@@ -39,6 +39,7 @@ end
 function dusk_ambience(hyperion_id, device_id)
    log(hyperion_id, "debug", "Dusk Ambience")
    local sunset_grace = cfg.sunset_grace(hyperion_id)
+   local evening_temp = cfg.evening_temp(hyperion_id)
    local now = os.time()
    local sunset = luup.sunset()
    local dusk = sunset - sunset_grace
@@ -53,6 +54,9 @@ function dusk_ambience(hyperion_id, device_id)
    local dim = math.floor((dusk_percent/100) * current_dim)
    log(hyperion_id, "debug", "dusk remaining " .. dusk_remaining .. " percent " .. dusk_percent .. " dim " .. dim)
    ez_vera.dim_actuate(device_id, dim)
+   if ( ez_vera.is_hue(device_id) ) then
+      ez_vera.hue_temp(device_id + 1, evening_temp)
+   end
 end
 
 function night_ambience(hyperion_id, device_id)
@@ -251,9 +255,6 @@ function update_ambient(hyperion_id, lights)
          ez_vera.dim_actuate(device_id, dim)
       elseif ( op == 'dusk' ) then
          dusk_ambience(hyperion_id, device_id)
-         if ( ez_vera.is_hue(device_id) ) then
-            ez_vera.hue_temp(device_id + 1, evening_temp)
-         end
       elseif op == 'day' then
          log(hyperion_id, "debug", "Daytime Ambience")
          local day_dim = 0
