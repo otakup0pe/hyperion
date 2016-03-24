@@ -50,9 +50,22 @@ function dusk_ambience(hyperion_id, device_id)
    else
       dusk_percent = 100
    end
-   local current_dim = hyperion_util.dim_get(hyperion_id)
-   local dim = math.floor((dusk_percent/100) * current_dim)
-   log(hyperion_id, "debug", "dusk remaining " .. dusk_remaining .. " percent " .. dusk_percent .. " dim " .. dim)
+   local dim
+   local day_dim = 0
+   if stormy_weather(hyperion_id) then
+      day_dim = dim
+   end
+   if dim_room(hyperion_id) then
+      day_dim = dim_based_on_inactivity(hyperion_id, dim)
+   end
+   if day_dim > 0 then
+      dim = day_dim
+      log(hyperion_id, 'debug', 'using day_dim level of ' .. day_dim)
+   else
+      local current_dim = hyperion_util.dim_get(hyperion_id)
+      dim = math.floor((dusk_percent/100) * current_dim)
+      log(hyperion_id, "debug", "dusk remaining " .. dusk_remaining .. " percent " .. dusk_percent .. " dim " .. dim)
+   end
    ez_vera.dim_actuate(device_id, dim)
    if ( ez_vera.is_hue(device_id) ) then
       ez_vera.hue_temp(device_id + 1, evening_temp)
