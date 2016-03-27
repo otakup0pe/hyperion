@@ -208,9 +208,9 @@ function save_grace(device_id, name)
     'Name': name + 'Grace'
   };
   if ( name == 'Sunrise' ) {
-    obj.Time = jQuery('#sunrise_grace').val();
-  } else {
-    obj.Time = jQuery('#sunset_grace').val();
+    obj.Length = jQuery('#sunrise_grace').val();
+  } else if ( name == 'Sunset' ) {
+    obj.Length = jQuery('#sunset_grace').val();
   }
   call_action(device_id, hyperion.SID_HYPERION, 'SetTimeout', obj);
 }

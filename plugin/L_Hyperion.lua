@@ -259,6 +259,7 @@ end
 
 function set_timeout(lul_device, name, time)
    local hyperion_id = tonumber(lul_device)
+   luup.log("FUCK FUCK " .. name .. " " .. tostring(time));
    cfg.set(hyperion_id, name, time)
    hyperion_ambience.update(hyperion_id)
    return true

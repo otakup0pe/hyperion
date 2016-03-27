@@ -366,7 +366,7 @@
         <argument>
           <name>Length</name>
           <direction>in</direction>
-          <relatedStateVariable>A_ARG_TYPE_GraceLength</relatedStateVariable>
+          <relatedStateVariable>A_ARG_TYPE_TimeoutTime</relatedStateVariable>
         </argument>
       </argumentList>
     </action>
