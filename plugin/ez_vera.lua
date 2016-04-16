@@ -127,8 +127,72 @@ function dim_actuate(device_id, dim)
    luup.call_action(const.SID_DIMMABLE, "SetLoadLevelTarget", {newLoadlevelTarget = dim}, device_id)
 end
 
-function sonos_favorite(device_id, favorite, volume)
-   luup.call_action("urn:micasaverde-com:serviceId:Sonos1", "PlayURI",
-                    {URIToPlay="SF:" .. favorite, Volume=volume},
+function sonos_favorite(device_id, favorite)
+   luup.call_action(const.SID_SONOS, "PlayURI",
+                    {URIToPlay="SF:" .. favorite},
                     device_id)
+end
+
+function sonos_group(primary, members)
+   luup.call_action(const.SID_SONOS, "UpdateGroupMembers",
+                    {Zones=table.concat(members, ",")},
+                     primary)
+end
+
+function sonos_volume(device, volume)
+   luup.call_action(const.SID_RENDERING, "SetVolume",
+                    {InstanceID="0",DesiredVolume=tostring(volume),Channel="Master"},
+                    device)
+end
+
+function sonos_volume_down(device, inc)
+   local current = luup.variable_get(const.SID_RENDERING, "Volume", device)
+   local new = 0
+   if ( current - inc > 0 ) then
+      new = current - inc
+   end
+   if current ~= new then
+      sonos_volume(device, new)
+   end
+end
+
+function sonos_volume_up(device, inc, max)
+   local current = luup.variable_get(const.SID_RENDERING, "Volume", device)
+   local new = max
+   if ( current + inc < max ) then
+      new = current + inc
+   end
+   if current ~= new then
+      sonos_volume(device, new)
+   end
+end
+
+function sonos_id(zone_name)
+   for id, dev in pairs(luup.devices) do
+      if luup.device_supports_service(const.SID_PROPS, id) then
+         local this_zone_name = luup.variable_get(const.SID_PROPS, "ZoneName", id)
+         luup.log("AAAAAAA " .. this_zone_name .. " vs " .. zone_name)
+         if this_zone_name == zone_name then
+            return id
+         end
+      end
+   end
+   return nil
+end
+
+function sonos_toggle(device)
+   local state = luup.variable_get(const.SID_AV,  "TransportState", device)
+   local action = nil
+   if ( state == "STOPPED" ) then
+      action = "Play"
+   elseif ( state == "PLAYING" ) or ( state == "TRANSITIONING" ) then
+      action = "Stop"
+   else
+      return
+   end
+   luup.call_action(const.SID_AV, action, {}, device)
+end
+
+function sonos_next(device)
+   luup.call_action(const.SID_AV, "Next", {}, device)
 end

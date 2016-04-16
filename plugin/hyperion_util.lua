@@ -113,7 +113,7 @@ function get_sensors(hyperion_id, sid)
    return sensors
 end
 
-function any_tripped(sensors)
+function any_tripped(hyperion_id, sensors)
    local now = os.time()
    for i, device_id in _G.ipairs(sensors) do
       local last_trip = luup.variable_get(const.SID_SSENSOR, "LastTrip", device_id)

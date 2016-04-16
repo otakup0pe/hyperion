@@ -1,16 +1,19 @@
-module("vera_constants", package.seeall)
+module('vera_constants', package.seeall)
 
-SID_HYPERION="urn:otakup0pe:serviceId:Hyperion1"
-SID_WEATHER="urn:upnp-micasaverde-com:serviceId:Weather1"
-SID_VSWITCH="urn:upnp-org:serviceId:VSwitch1"
-SID_SPOWER="urn:upnp-org:serviceId:SwitchPower1"
-SID_DIMMABLE="urn:upnp-org:serviceId:Dimming1"
-SID_HUEHUB="urn:intvelt-com:serviceId:HueController1"
-SID_HUEBULB="urn:intvelt-com:serviceId:HueColors1"
-SID_HOUSEMODE="urn:micasaverde-com:serviceId:HouseModes1"
-SID_SSENSOR="urn:micasaverde-com:serviceId:SecuritySensor1"
-SID_LSENSOR="urn:micasaverde-com:serviceId:LightSensor1"
-
+SID_HYPERION='urn:otakup0pe:serviceId:Hyperion1'
+SID_WEATHER='urn:upnp-micasaverde-com:serviceId:Weather1'
+SID_VSWITCH='urn:upnp-org:serviceId:VSwitch1'
+SID_SPOWER='urn:upnp-org:serviceId:SwitchPower1'
+SID_DIMMABLE='urn:upnp-org:serviceId:Dimming1'
+SID_HUEHUB='urn:intvelt-com:serviceId:HueController1'
+SID_HUEBULB='urn:intvelt-com:serviceId:HueColors1'
+SID_HOUSEMODE='urn:micasaverde-com:serviceId:HouseModes1'
+SID_SSENSOR='urn:micasaverde-com:serviceId:SecuritySensor1'
+SID_LSENSOR='urn:micasaverde-com:serviceId:LightSensor1'
+SID_SONOS='urn:micasaverde-com:serviceId:Sonos1'
+SID_RENDERING='urn:upnp-org:serviceId:RenderingControl'
+SID_PROPS='urn:upnp-org:serviceId:DeviceProperties'
+SID_AV='urn:upnp-org:serviceId:AVTransport'
 HM_HOME='home'
 HM_AWAY='away'
 HM_VACATION='vacation'

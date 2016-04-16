@@ -202,7 +202,7 @@ end
 function dim_based_on_inactivity(hyperion_id, dim)
    local sensors = hyperion_util.get_sensors(hyperion_id, const.SID_SSENSOR)
    if table.getn(sensors) > 0 then
-      if not hyperion_util.any_tripped(sensors) then
+      if not hyperion_util.any_tripped(hyperion_id, sensors) then
          if cfg.inactive_dim(hyperion_id) then
             dim = math.floor(dim / 2)
             if dim <= 0 then

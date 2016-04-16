@@ -108,3 +108,106 @@ function mode_toggle(hyperion_id)
       ez_vera.switch_actuate(ambience_id, false)
    end
 end
+
+function global_control(switch, devices)
+   local power = ez_vera.switch_get(switch)
+
+   for i, hyperion in _G.ipairs(devices) do
+      ez_vera.switch_actuate(hyperion, power)
+   end
+end
+
+PRIMARY="Living Room"
+ZONES={
+   {Name="Living Room", Max=70, Inc=15},
+   {Name="Media Room", Max=60,  Inc=10},
+   {Name="Bathroom", Max=50, Inc=10},
+   {Name="Kitchen", Max=50, Inc=15},
+   {Name="Bedroom", Max=70, Inc=15}
+}
+STATIONS={
+   "beefsgiving",
+   "chill"
+}
+
+function zone_names()
+   local z = {}
+   for i, obj in _G.ipairs(ZONES) do
+      table.insert(z, obj.Name)
+   end
+   return z
+end
+
+function ensure_group()
+   ez_vera.sonos_group(ez_vera.sonos_id(PRIMARY), zone_names())
+end
+
+function volume_up()
+   ensure_group()
+   for i, obj in _G.ipairs(ZONES) do
+      ez_vera.sonos_volume_up(ez_vera.sonos_id(obj.Name), obj.Inc, obj.Max)
+   end
+end
+
+function volume_down()
+   ensure_group()
+   for i, obj in _G.ipairs(ZONES) do
+      ez_vera.sonos_volume_down(ez_vera.sonos_id(obj.Name), obj.Inc)
+   end
+end
+
+function sonos_toggle()
+   ensure_group()
+   ez_vera.sonos_toggle(ez_vera.sonos_id(PRIMARY))
+end
+
+function sonos_station(station)
+   if table.getn(STATIONS) < station then
+      return
+   end
+   local fav = STATIONS[station]
+   ez_vera.sonos_favorite(ez_vera.sonos_id(PRIMARY), fav)
+end
+
+function sonos_next()
+   ez_vera.sonos_next(ez_vera.sonos_id(PRIMARY), fav)
+end
+
+function ipad_dim()
+   local now = os.time()
+   local last = luup.variable_get(const.SID_SSENSOR, "LastTrip", 295)
+   local tripped = false
+   if last_trip ~= nil then
+      if now - tonumber(last_trip) < 15 then
+         tripped = true
+      end
+   end
+   local current = ez_vera.switch_get(112)
+   luup.log("ipad_dim is_dim " .. tostring(current) .. " any " .. tostring(tripped))
+   if any and current then
+      ez_vera.switch_actuate(112, false)
+   elseif not any and not current then
+      ez_vera.switch_actuate(112, true)
+   end
+end
+
+function light_on_door(aaa)
+   local current = ez_vera.switch_get(325)
+   local last = luup.variable_get(const.SID_SSENSOR, "LastTrip", 249)
+   local tripped = (luup.variable_get(const.SID_SSENSOR, "Tripped", 249) == 1)
+   local now = os.time()
+   if last ~= nil and tripped ~= nil then
+      if tripped then
+         local elapsed = (now - tonumber(last)) < 5
+         if elapsed and not current then
+            ez_vera.switch_actuate(325, true)
+         elseif not elapsed and current then
+            ez_vera.switch_actuate(325, false)
+         end
+      else
+         if ( now - tonumber(last) < 5 ) then
+            luup.call_timer("light_on_door", 1, "5", "", nil)
+         end
+      end
+   end
+end
