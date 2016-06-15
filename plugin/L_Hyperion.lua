@@ -137,6 +137,23 @@ function startup(lul_device)
    luup.call_timer("tick", 1, "60", "", hyperion_id)
 end
 
+function ensure_active(hyperion_id)
+   if not ez_vera.switch_get(hyperion_id) then
+      ez_vera.switch_set(hyperion_id, true)
+   end
+   local op = hyperion_util.operating_mode(hyperion_id)
+   local day = false;
+   if op == 'day' then
+      day = not (hyperion_util.stormy_weather(hyperion_id) and hyperion_util.dim_room(hyperion_id) and hyperion_util.active_room(hyperion_id) )
+   end
+   if op == 'night' or op == 'dusk' or op == 'dawn' or day then
+      local ambience_id = hyperion_util.get_child(hyperion_id, 'ambience')
+      if ez_vera.switch_get(ambience_id) then
+         ez_vera.switch_actuate(ambience_id, false)
+      end
+   end
+end
+
 function do_dim(hyperion_id, target)
    hyperion_util.dim_set(hyperion_id, target)
    hyperion_ambience.update(hyperion_id)
@@ -157,11 +174,17 @@ function do_switch(hyperion_id, target)
 end
 
 function do_ambience(hyperion_id, target)
+   if not ez_vera.switch_get(hyperion_id) then
+      ez_vera.switch_set(hyperion_id, true)
+   end
    cfg.set(hyperion_id, 'Ambience', target)
    ez_vera.switch_set(hyperion_util.get_child(hyperion_id, 'ambience'), target)
 end
 
 function do_temp(hyperion_id, target)
+   if not ez_vera.switch_get(hyperion_id) then
+      ez_vera.switch_set(hyperion_id, true)
+   end
    cfg.set(hyperion_id, 'Preset', target)
    ez_vera.switch_set(hyperion_util.get_child(hyperion_id, 'temp'), target)
 end
@@ -170,9 +193,10 @@ function light_dim(lul_device, target)
    local device_id = tonumber(lul_device)
    local hyperion_id = hyperion_util.ensure_parent(device_id)
    if hyperion_util.get_child(hyperion_id, 'dimmer') == device_id then
-      do_dim(hyperion_id, target)
-      return true
+      ensure_active(hyperion_id)
    end
+   do_dim(hyperion_id, target)
+   return true
 end
 
 function child_watch(lul_device, lul_service, lul_variable, lul_value_old, lul_value_new)
@@ -180,8 +204,10 @@ function child_watch(lul_device, lul_service, lul_variable, lul_value_old, lul_v
    local hyperion_id = hyperion_util.ensure_parent(device_id)
    if hyperion_util.get_child(hyperion_id, 'dimmer') == device_id then
       if lul_service == const.SID_DIMMABLE and lul_variable == "LoadLevelStatus"  then
+         ensure_active(hyperion_id)
          do_dim(hyperion_id, lul_value_new)
       elseif lul_service == const.SID_SPOWER and lul_variable == "Status" then
+         ensure_active(hyperion_id)
          do_switch(hyperion_id, lul_value_new)
       end
    elseif hyperion_util.get_child(hyperion_id, 'ambience') == device_id then
@@ -202,6 +228,7 @@ function light_switch(lul_device, target)
       if hyperion_util.get_child(hyperion_id, 'ambience') == device_id then
          do_ambience(hyperion_id, target)
       elseif hyperion_util.get_child(hyperion_id, 'dimmer') == device_id then
+         ensure_active(hyperion_id)
          do_switch(hyperion_id, target)
       elseif hyperion_util.get_child(hyperion_id, 'temp') == device_id then
          do_temp(hyperion_id, target)

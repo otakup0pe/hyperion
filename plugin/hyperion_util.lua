@@ -129,3 +129,93 @@ function any_tripped(sensors)
    end
    return false
 end
+
+function operating_mode(hyperion_id)
+   local evening_temp = cfg.evening_temp(hyperion_id)
+   local now = os.time()
+   local time_to_sunset = 0 - (now - luup.sunset())
+   local time_past_sunrise = now - (luup.sunrise() - 86400)
+   local is_night = luup.is_night();
+   local op = nil
+   if cfg.ambient_dusk(hyperion_id) and is_dusk(hyperion_id) then
+      op = 'dusk'
+   elseif cfg.ambient_dawn(hyperion_id) and is_dawn(hyperion_id) then
+      op = 'dawn'
+   elseif cfg.ambient_night(hyperion_id) and is_night then
+      op = 'night'
+   elseif cfg.ambient_day(hyperion_id) then
+      op = 'day'
+   end
+   return op
+end
+
+function stormy_weather(hyperion_id)
+   local require_devices = hyperion_util.device_list(hyperion_id, 'require_devices')
+   if table.getn(require_devices) > 0 then
+      for i, device_id in _G.ipairs(require_devices) do
+         if luup.device_supports_service(const.SID_WEATHER) then
+            local condition = hyperion_util.weather_condition(device_id)
+            log(hyperion_id, 'debug', 'Weather ' .. device_id .. ' condition group ' .. condition)
+            if condition == "cloudy" or condition == "fog" or condition == "rain" then
+               return true
+            end
+         end
+      end
+   end
+   return false
+end
+
+function dim_room(hyperion_id)
+   local sensors = hyperion_util.get_sensors(hyperion_id, const.SID_LSENSOR)
+   if table.getn(sensors) > 0 then
+      for i, device_id in _G.ipairs(sensors) do
+         local lux_str = luup.variable_get(const.SID_LSENSOR, 'CurrentLevel', device_id)
+         log(hyperion_id, 'debug', 'LightSensor ' .. tostring(device_id) .. ' CurrentLevel ' .. lux_str)
+         local lux = tonumber(lux_str)
+         if lux == nil then
+            return false
+         else
+            local lux_threshold = cfg.lux_threshold()
+            if lux <= lux_threshold then
+               log(hyperion_id, 'debug', 'LightSensor ' .. tostring(device_id) .. ' under threshold of ' .. tostring(lux_threshold))
+               return true
+            end
+         end
+      end
+   end
+   return false
+end
+
+function active_room(hyperion_id)
+   local sensors = hyperion_util.get_sensors(hyperion_id, const.SID_SSENSOR)
+   if table.getn(sensors) > 0 then
+      return hyperion_util.any_tripped(sensors)
+   else
+      return false
+   end
+end
+
+function time_past_sunrise()
+   local now = os.time()
+   return now - (luup.sunrise() - 86400)
+end
+
+function is_dusk(hyperion_id)
+   local sunset_grace = cfg.sunset_grace(hyperion_id)
+   local now = os.time()
+   local time_to_sunset = 0 - (now - luup.sunset())
+   log(hyperion_id, 'debug', "to sunset " .. time_to_sunset)
+   return ((time_to_sunset >= 0 and (time_to_sunset <= sunset_grace)) or ((time_to_sunset > -120) and time_to_sunset <= 0))
+end
+
+function is_dawn(hyperion_id)
+   local morning_hour = cfg.morning_hour(hyperion_id)
+   local morning_minute = cfg.morning_minute(hyperion_id)
+   local sunrise_grace = cfg.sunrise_grace(hyperion_id)
+   local now = os.time()
+   local time_past_sunrise = time_past_sunrise()
+   local past_dawn = tonumber(os.date("%H", now)) >= morning_hour and tonumber(os.date("%M", now)) >= morning_minute;
+   log(hyperion_id, 'debug', 'Past dawn ' .. tostring(past_dawn) .. " past sunrise " .. time_past_sunrise)
+   return time_past_sunrise >= 0 and past_dawn and ( time_past_sunrise <= sunrise_grace )
+end
+
