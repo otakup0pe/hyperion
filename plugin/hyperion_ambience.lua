@@ -157,7 +157,7 @@ function dim_group(hyperion_id, lights, cb)
 end
 
 function dim_based_on_inactivity(hyperion_id, dim)
-   if hyperion_util.active_room(hyperion_id) then
+   if not hyperion_util.active_room(hyperion_id) then
       if cfg.inactive_dim(hyperion_id) then
          dim = math.floor(dim / 2)
          if dim <= 0 then
