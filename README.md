@@ -24,7 +24,7 @@ Each Hyperion device will create three child devices. While you may use the pare
 
 When the Hyperion device is set to `Off`, nothing occurs. You may use your controlled devices as you would normally, or via external apps. When the Hyperion device is set to `On`, it will be constantly adjusting your devices, thus rendering manual control quite difficult.
 
-The Hyperion plugin can operate in either ambient lighting or preset mode. In ambient mode, the lights will be adjusted as described [here](https://github.com/otakup0pe/hyperion/wiki/Ambient-Lighting-Patterns). In preset mode, the lights will simply be left at their dimmer level.
+The Hyperion plugin can operate in either ambient lighting or preset mode. In ambient mode, the lights will be adjusted as described [here](https://github.com/otakup0pe/hyperion/wiki/Ambient-Lighting-Patterns), albeit capped at their dimmer level In preset mode, the lights will simply be left at their dimmer level.
 
 Dimming Semantics
 ------------------
