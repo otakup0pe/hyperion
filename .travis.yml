@@ -2,6 +2,9 @@ sudo: false
 language: python
 script: make test
 
-before_install:
-  - sudo apt-get update -qq -y
-  - sudo apt-get install lua5.1 libxml2-utils libjson-pp-perl
+addons:
+  apt:
+    packages:
+    - lua5.1
+    - libxml2-utils
+    - libjson-pp-perl

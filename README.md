@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/otakup0pe/hyperion.svg?branch=master)](https://travis-ci.org/otakup0pe/hyperion)![Maintenance](https://img.shields.io/maintenance/yes/2016.svg?maxAge=2592000)
+
 # Hyperion
 
 __Of Hyperion we are told that he was the first to understand, by diligent attention and observation, the movement of both the sun and the moon and the other stars, and the seasons as well...__
