@@ -144,12 +144,14 @@ function ensure_active(hyperion_id)
    local op = hyperion_util.operating_mode(hyperion_id)
    local day = false;
    if op == 'day' then
-      day = not (hyperion_util.stormy_weather(hyperion_id) and hyperion_util.dim_room(hyperion_id) and hyperion_util.active_room(hyperion_id) )
+      day = not hyperion_util.stormy_weather(hyperion_id) and not hyperion_util.dim_room(hyperion_id) and not hyperion_util.active_room(hyperion_id)
    end
    if op == 'night' or op == 'dusk' or op == 'dawn' or day then
-      local ambience_id = hyperion_util.get_child(hyperion_id, 'ambience')
-      if ez_vera.switch_get(ambience_id) then
-         ez_vera.switch_actuate(ambience_id, false)
+      if not hyperion_util.dim_room(hyperion_id) and not hyperion_util.active_room(hyperion_id) then
+         local ambience_id = hyperion_util.get_child(hyperion_id, 'ambience')
+         if ez_vera.switch_get(ambience_id) then
+            ez_vera.switch_actuate(ambience_id, false)
+         end
       end
    end
 end

@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+SCRIPT_DIR=$(cd ${0%/*} && pwd)
+SRC_DIR="${SCRIPT_DIR%/*}/plugin"
+
+for f in $SRC_DIR/D_*.json ; do
+    json_pp < $f 1> /dev/null
+    if [ $? != 0 ] ; then
+        echo "Problem with ${f}"
+        exit 1
+    fi
+done
+
+exit 0

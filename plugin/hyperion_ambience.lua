@@ -188,14 +188,15 @@ function update_ambient(hyperion_id, lights)
       elseif op == 'day' then
          log(hyperion_id, "debug", "Daytime Ambience")
          local day_dim = 0
-         if hyperion_util.stormy_weather(hyperion_id) then
-            day_dim = dim
-         end
          if hyperion_util.dim_room(hyperion_id) then
             day_dim = dim_based_on_inactivity(hyperion_id, dim)
          end
          if day_dim > 0 and ez_vera.is_hue(device_id) then
-            ez_vera.hue_temp(device_id + 1, day_temp)
+            if hyperion_util.stormy_weather(hyperion_id) then
+               ez_vera.hue_colour(device_id + 1, 42000, 139)
+            else
+               ez_vera.hue_temp(device_id + 1, day_temp)
+            end
          end
          ez_vera.dim_actuate(device_id, day_dim)
       elseif op == 'dawn' then
