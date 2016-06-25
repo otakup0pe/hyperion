@@ -94,3 +94,11 @@ function mode_toggle(hyperion_id)
       ez_vera.switch_actuate(ambience_id, false)
    end
 end
+
+function global_control(switch, devices)
+   local power = ez_vera.switch_get(switch)
+
+   for i, hyperion in _G.ipairs(devices) do
+      ez_vera.switch_actuate(hyperion, power)
+   end
+end
