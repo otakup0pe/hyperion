@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/otakup0pe/hyperion.svg?branch=master)](https://travis-ci.org/otakup0pe/hyperion)![Maintenance](https://img.shields.io/maintenance/yes/2016.svg?maxAge=2592000)
+[![Build Status](https://travis-ci.org/otakup0pe/hyperion.svg?branch=master)](https://travis-ci.org/otakup0pe/hyperion)![Maintenance](https://img.shields.io/maintenance/yes/2017.svg?maxAge=2592000)
 
 # Hyperion
 
