@@ -125,6 +125,8 @@ function any_tripped(sensors)
       if tripped <= cfg.motion_timeout(hyperion_id) then
          log(hyperion_id, 'debug', 'Sensor ' .. tostring(device_id) .. ' tripped ' .. tostring(tripped) .. ' ago')
          return true
+      else
+         log(hyperion_id, 'debug', 'Sensor ' .. tostring(device_id) .. ' will trip '  .. tostring(0 - (now  - tonumber(last_trip))))
       end
    end
    return false

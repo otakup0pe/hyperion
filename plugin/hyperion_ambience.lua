@@ -132,8 +132,8 @@ function ambience_gate(hyperion_id)
    end
    local require_devices = hyperion_util.device_list(hyperion_id, 'require_devices')
    if (table.getn(require_devices) > 0) then
-      if not ez_vera.any_on(require_devices) then
-         log(hyperion_id, 'debug', 'Ambience disabled via lack of required switch')
+      if not ez_vera.any_on(require_devices) and not hyperion_util.any_tripped(hyperion_util.get_sensors(hyperion_id, vera_constants.SID_SSENSOR)) then
+         log(hyperion_id, 'debug', 'Ambience disabled via lack of required devices')
          return false
       end
    end
