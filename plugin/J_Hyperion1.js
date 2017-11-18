@@ -1,5 +1,7 @@
 /* global set_panel_html, Ajax, command_url, api */
 
+// lol http://forum.micasaverde.com/index.php?msg=334231;topic=51508.30
+
 var hyperion = {
   SID_HYPERION: "urn:otakup0pe:serviceId:Hyperion1",
   SID_SPOWER: "urn:upnp-org:serviceId:SwitchPower1",
@@ -227,7 +229,7 @@ function call_action(device_id, sid, action, args) {
   for (k in args ) {
     o[k] = args[k];
   };
-  new Ajax.Request(command_url + '/data_request', {
+  new Ajax.Request(data_command_url, {
     method: 'get',
     parameters: o
   });

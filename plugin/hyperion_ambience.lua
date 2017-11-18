@@ -68,7 +68,7 @@ function dusk_ambience(hyperion_id, device_id)
    end
    ez_vera.dim_actuate(device_id, dim)
    if ( ez_vera.is_hue(device_id) ) then
-      ez_vera.hue_temp(device_id + 1, evening_temp)
+      ez_vera.hue_temp(device_id, evening_temp)
    end
 end
 
@@ -122,7 +122,7 @@ function night_ambience(hyperion_id, device_id)
       temp = math.floor(night_temp + ( ( time_to_night / evening_secs ) * temp_dist ))
    end
    log(hyperion_id, "debug", "setting temp to " .. temp)
-   ez_vera.hue_temp(device_id + 1, temp)
+   ez_vera.hue_temp(device_id, temp)
 end
 
 function ambience_gate(hyperion_id)
@@ -195,7 +195,7 @@ function update_ambient(hyperion_id, lights)
             if hyperion_util.stormy_weather(hyperion_id) then
                ez_vera.hue_colour(device_id + 1, 42000, 139)
             else
-               ez_vera.hue_temp(device_id + 1, day_temp)
+               ez_vera.hue_temp(device_id, day_temp)
             end
          end
          ez_vera.dim_actuate(device_id, day_dim)
@@ -219,7 +219,7 @@ function update_preset(hyperion_id, lights)
    local cb = function(hyperion_id, device_id)
       ez_vera.dim_actuate(device_id, dim)
       if ez_vera.is_hue(device_id) then
-         ez_vera.hue_temp(device_id + 1, preset_temp)
+         ez_vera.hue_temp(device_id, preset_temp)
       end
    end
    dim_group(hyperion_id, lights, cb)

@@ -12,13 +12,19 @@ function toggle(device_id)
 end
 
 function is_hue(device_id)
-   local parent = tonumber(luup.devices[device_id].device_num_parent)
-   if ( parent ~= 0 ) then
-      if ( luup.device_supports_service(const.SID_HUEHUB, parent) ) then
-         return true
+   return luup.device_supports_service(const.SID_HUEBULB, device_id)
+end
+
+function hue_val(device_id, key)
+   local val = luup.variable_get(const.SID_HUEBULB, "LampValues", device_id)
+   
+   for val_element in string.gmatch(val, "([^;]+)") do
+      local element_bit = {string.gmatch(val, "([^=]+)")}
+      if element_bit[0] == key then
+         return element_bit[1]
       end
    end
-   return false
+   return nil
 end
 
 function hue_temp(device_id, p_temp)
@@ -33,8 +39,12 @@ function hue_temp(device_id, p_temp)
       local sat_scaled = sat_end + math.floor(sat_diff * (p_temp - 1000) / 500)
       hue_colour(device_id, hue_scaled, sat_scaled)
    else
-      local temp = 100 - math.floor(100 * ( ( p_temp - 2000 ) / ( 6500 - 2000 ) ) )
-      local current = luup.variable_get(const.SID_HUEBULB, "ColorTemperature", device_id)
+      -- local temp = 100 - math.floor(100 * ( ( p_temp - 2000 ) / ( 6500 - 2000 ) ) )
+      -- from mios hue plugin
+      -- local kelvin = 6500 - (colortemperature - 153) * 12,9682997118
+      -- local temp = kelvin / 100
+      local temp = 500 - (153 + math.floor(347 * ( p_temp - 2000 ) / ( 6500 - 2500 ) ) )
+      local current = hue_val(device_id, "ct")
       if type(current) == 'string' then
          current = tonumber(current)
       elseif type(current) == 'int' then
@@ -43,18 +53,16 @@ function hue_temp(device_id, p_temp)
          current = 0
       end
       if temp ~= current then
-         luup.call_action(const.SID_HUEBULB,"SetColorTemperature", {newColorTemperature=temp}, device_id)
+         luup.call_action(const.SID_HUEBULB,"SetColorTemperature", {ColorTemperature=temp, Effect="none", Transitiontime=10, rand=math.random(), action="SetColorTemperature", serviceId=const.SID_HUEBULB, DeviceNum=device_id}, device_id)
       end
    end
 end
 
 function hue_colour(device_id, hue, sat)
-   local current_hue = luup.variable_get(const.SID_HUEBULB, "Hue", device_id)
-   local current_sat = luup.variable_get(const.SID_HUEBULB, "Saturation", device_id)
-   local desired_hue = math.floor(100 * ( hue / 65535 ))
-   local desired_sat = math.floor(100 * ( sat / 254 ))
-   if current_hue ~= desired_hue or current_sat ~= desired_sat then
-      luup.call_action(const.SID_HUEBULB, "SetHueSaturation", {newHue=desired_hue, newSaturation=desired_sat}, device_id)
+   local current_hue = hue_val(device_id, "hue")
+   local current_sat = hue_val(device_id, "sat")
+   if current_hue ~= hue or current_sat ~= sat then
+      luup.call_action(const.SID_HUEBULB, "SetHueAndSaturation", {Hue=hue, Saturation=sat, Effect="none", Transitiontime=10, rand=math.random(), action="SetHueAndSaturation", serviceId=const.SID_HUEBULB, DeviceNum=device_id}, device_id)
    end
 end
 
