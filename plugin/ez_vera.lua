@@ -39,11 +39,8 @@ function hue_temp(device_id, p_temp)
       local sat_scaled = sat_end + math.floor(sat_diff * (p_temp - 1000) / 500)
       hue_colour(device_id, hue_scaled, sat_scaled)
    else
-      -- local temp = 100 - math.floor(100 * ( ( p_temp - 2000 ) / ( 6500 - 2000 ) ) )
-      -- from mios hue plugin
-      -- local kelvin = 6500 - (colortemperature - 153) * 12,9682997118
-      -- local temp = kelvin / 100
-      local temp = 500 - (153 + math.floor(347 * ( p_temp - 2000 ) / ( 6500 - 2500 ) ) )
+      -- kelvin to mired
+      local temp = math.floor(1000000 / p_temp)
       local current = hue_val(device_id, "ct")
       if type(current) == 'string' then
          current = tonumber(current)
