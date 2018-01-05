@@ -5,9 +5,17 @@ local ez_vera = require("ez_vera")
 local log = hyperion_util.log
 local cfg = require("hyperion_config")
 
+function external_update(device_id)
+   local mode = hyperion_util.house_mode()
+   if update and (mode == const.HM_HOME or mode == const.HM_VACATION) then
+      hyperion_ambience.update(maybe_hyperion_id)
+   end
+end
+
 function external_watch(lul_device, lul_service, lul_variable, lul_value_old, lul_value_new)
    local my_id = tonumber(lul_device)
    for maybe_hyperion_id, params in pairs(luup.devices) do
+      
       if luup.device_supports_service(const.SID_HYPERION, maybe_hyperion_id) then
          local update = false
          for i, required_id in _G.ipairs(hyperion_util.device_list(maybe_hyperion_id, 'require_devices')) do
@@ -22,10 +30,7 @@ function external_watch(lul_device, lul_service, lul_variable, lul_value_old, lu
                update = true
             end
          end
-         local mode = hyperion_util.house_mode()
-         if update and mode == const.HM_HOME then
-            hyperion_ambience.update(maybe_hyperion_id)
-         end
+         external_update(maybe_hyperion_id)
       end
    end
 end
