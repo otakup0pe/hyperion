@@ -5,10 +5,10 @@ local ez_vera = require("ez_vera")
 local log = hyperion_util.log
 local cfg = require("hyperion_config")
 
-function external_update(device_id)
+function external_update(device_id, update)
    local mode = hyperion_util.house_mode()
    if update and (mode == const.HM_HOME or mode == const.HM_VACATION) then
-      hyperion_ambience.update(maybe_hyperion_id)
+      hyperion_ambience.update(device_id)
    end
 end
 
@@ -30,7 +30,7 @@ function external_watch(lul_device, lul_service, lul_variable, lul_value_old, lu
                update = true
             end
          end
-         external_update(maybe_hyperion_id)
+         external_update(maybe_hyperion_id, update)
       end
    end
 end
