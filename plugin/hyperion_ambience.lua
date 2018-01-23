@@ -153,7 +153,6 @@ function dim_group(hyperion_id, lights, cb)
          log(hyperion_id, "debug", "Skipping device #" .. i .. "(" .. device_id .. ")")
          ez_vera.switch_actuate(device_id, false)
       end
-      luup.sleep(200)
    end
 end
 

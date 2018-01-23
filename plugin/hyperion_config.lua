@@ -49,7 +49,7 @@ function night_minute(hyperion_id)
    return tonumber(get(hyperion_id, "NightMinute", "00"))
 end
 
-function night_temp()
+function night_temp(hyperion_id)
    return tonumber(get(hyperion_id, "NightTemp", "1500"))
 end
 

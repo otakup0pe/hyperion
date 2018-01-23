@@ -115,6 +115,7 @@ end
 
 function any_tripped(sensors)
    local now = os.time()
+   local is_tripped = false
    for i, device_id in _G.ipairs(sensors) do
       local last_trip = luup.variable_get(const.SID_SSENSOR, "LastTrip", device_id)
       if last_trip == nil then
@@ -124,12 +125,12 @@ function any_tripped(sensors)
       local tripped = now - tonumber(last_trip)
       if tripped <= cfg.motion_timeout(hyperion_id) then
          log(hyperion_id, 'debug', 'Sensor ' .. tostring(device_id) .. ' tripped ' .. tostring(tripped) .. ' ago')
-         return true
+         is_tripped = true
       else
          log(hyperion_id, 'debug', 'Sensor ' .. tostring(device_id) .. ' will trip '  .. tostring(0 - (now  - tonumber(last_trip))))
       end
    end
-   return false
+   return is_tripped
 end
 
 function operating_mode(hyperion_id)
