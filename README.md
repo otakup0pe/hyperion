@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/otakup0pe/hyperion.svg?branch=master)](https://travis-ci.org/otakup0pe/hyperion)![Maintenance](https://img.shields.io/maintenance/yes/2017.svg?maxAge=2592000)
+[![Build Status](https://travis-ci.org/otakup0pe/hyperion.svg?branch=master)](https://travis-ci.org/otakup0pe/hyperion)![Maintenance](https://img.shields.io/maintenance/yes/2018.svg?maxAge=2592000)
 
 # Hyperion
 
@@ -13,9 +13,9 @@ It probably only works with UI7. It has been tested on a [Vera 3](http://getvera
 Installation
 ------------
 
-As of now, this plugin is not in the MiOS app store. That should happen soon, but until then you may (relatively) install it from GitHub. If you are new to this kind of thing, just download this [zip](https://github.com/otakup0pe/hyperion/archive/master.zip) file. Extract the contents somewhere comfortable on your file system.
+The plugin can be installed from the MiOS [app store](http://apps.mios.com/plugin.php?id=8826).
 
-You can now either upload the contents of the `plugin` directory via SCP or the 'LuuP Files' section of the MiOS UI. The Vera should restart, and then you should be able to manually add a device from the `D_Hyperion1.xml` definition.
+If you are feeling adventurous you can install a development release from GitHub by downloading this [zip](https://github.com/otakup0pe/hyperion/archive/master.zip) file. Extract the contents somewhere comfortable on your file system. You can now either upload the contents of the `plugin` directory via SCP or the 'LuuP Files' section of the MiOS UI. The Vera should restart, and then you should be able to manually add a device from the `D_Hyperion1.xml` definition.
 
 At the very least, you must add devices to be controlled by the plugin. Find your device in the list, and then open it's 'Device Selection' tab. Under the 'Control Devices' section, select the devices you wish to see controlled.
 
@@ -38,7 +38,7 @@ Development
 
 There is a scene integration [API](https://github.com/otakup0pe/hyperion/wiki/Scene-Integration-API). This API, and the uPnP interface, should remain consistent. Other functionality may be added. Random other LUA functions are likely to change.
 
-Pull requests welcome! If you are doing local hacking, then the two included scripts may be useful.
+Pull requests welcome! I find the shell scripts in [this](https://github.com/otakup0pe/ansible-veradev) repository to be handy for development and you may as well!
 
 Author
 ------
