@@ -94,8 +94,9 @@ function night_ambience(hyperion_id, device_id)
       night_minute = 60
    end
    local past_night_time = tonumber(os.date("%H", now)) >= night_hour and tonumber(os.date("%m", now)) >= night_minute
-   log(hyperion_id, "debug", "ambient_night past_sunrise:" .. tostring(past_sunrise) .. " past_night_time:" .. tostring(past_night_time))
-   if ( past_sunrise and past_night_time ) or ( past_sunrise and now_hour <= sunrise_hour ) then
+   local past_midnight = past_sunrise and now_hour <= sunrise_hour
+   log(hyperion_id, "debug", "ambient_night past_sunrise:" .. tostring(past_sunrise) .. " past_night_time:" .. tostring(past_night_time) .. " past_midnight:" .. tostring(past_midnight))
+   if ( past_sunrise and past_night_time ) or ( past_midnight ) then
       temp = night_temp;
    else
       log(hyperion_id, "debug", "temps " .. evening_temp .. " " .. night_temp)
