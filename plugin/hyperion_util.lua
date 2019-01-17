@@ -72,24 +72,27 @@ function weather_condition(weather_id)
    return condition
 end
 
-local house_mode_id = 0
+local house_mode_id_cache = 0
+
+function house_mode_id()
+   local house_mode_id = -1
+   for device_id, obj in pairs(luup.devices) do
+      if luup.device_supports_service(const.SID_HOUSEMODE, device_id) then
+         house_mode_id = device_id
+         break
+      end
+   end
+   return house_mode_id
+end
 
 function house_mode()
-   if house_mode_id == 0 then
-      for device_id, obj in pairs(luup.devices) do
-         if luup.device_supports_service(const.SID_HOUSEMODE, device_id) then
-            house_mode_id = device_id
-            break
-         end
-      end
-      if house_mode_id == 0 then
-         house_mode_id = -1
-      end
+   if house_mode_id_cache == 0 then
+      house_mode_id_cache = house_mode_id()
    end
-   if house_mode_id == -1 then
+   if house_mode_id_cache == -1 then
       return
    end
-   local hmode = tonumber(luup.variable_get(const.SID_HOUSEMODE, "HMode", house_mode_id), 10)
+   local hmode = tonumber(luup.variable_get(const.SID_HOUSEMODE, "HMode", house_mode_id_cache), 10)
 
    if hmode == 1 then
       return const.HM_HOME

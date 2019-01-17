@@ -7,8 +7,18 @@ local cfg = require("hyperion_config")
 
 function external_update(hyperion_id, update)
    local mode = hyperion_util.house_mode()
-   if update and (mode == const.HM_HOME or mode == const.HM_VACATION) then
+   if update and (mode == const.HM_HOME) then
       hyperion_ambience.update(hyperion_id)
+   elseif mode ~= const.HM_HOME then
+      if not ez_vera.switch_get(hyperion_id) then
+         log(hyperion_id, "debug", "This switch is disabled")
+      else
+         local lights = hyperion_util.device_list(hyperion_id, 'include_devices')
+         local cb = function(hyperion_id, device_id)
+            ez_vera.toggle(device_id, false)
+         end
+         dim_group(hyperion_id, lights, cb)
+      end
    end
 end
 
@@ -136,6 +146,10 @@ function startup(lul_device)
    validate_device_list(hyperion_id, 'require_devices', '')
    validate_device_list(hyperion_id, 'override_devices', '')
    validate_device_list(hyperion_id, 'include_devices', '')
+   local house_mode_id = hyperion_util.house_mode_id()
+   if house_mode_id ~= -1 then
+      luup.variable_watch("external_watch", const.SID_HOUSEMODE, "HMode", house_mode_id)
+   end
    ensure_children(hyperion_id)
    hyperion_ambience.update(hyperion_id)
    luup.call_timer("tick", 1, "60", "", hyperion_id)

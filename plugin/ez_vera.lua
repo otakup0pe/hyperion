@@ -27,18 +27,28 @@ function hue_val(device_id, key)
    return nil
 end
 
+function bulb_model(device_id)
+   return luup.variable_get(const.SID_HUEBULB, "BulbModelID", device_id)
+end
 function is_color(device_id)
-   local model = luup.variable_get(const.SID_HUEBULB, "BulbModelID", device_id)
-   if model == "LTW011" then
+   if bulb_model(device_id) == "LTW011" then
       return false
    else
       return true
    end
 end
 
+function rgb_only(device_id)
+   if bulb_model(device_id) == "LLC010" then
+      return true
+   else
+      return false
+   end
+end
+
 function hue_temp(device_id, p_temp)
    if ( p_temp <= 2000 ) then
-      if is_color(device_id) then
+      if is_color(device_id) or rgb_only(device_id) then
          local hue_start = 12000
          local sat_start = 227
          local hue_end = 10000
