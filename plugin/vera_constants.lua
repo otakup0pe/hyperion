@@ -10,7 +10,7 @@ SID_HOUSEMODE="urn:micasaverde-com:serviceId:HouseModes1"
 SID_SSENSOR="urn:micasaverde-com:serviceId:SecuritySensor1"
 SID_LSENSOR="urn:micasaverde-com:serviceId:LightSensor1"
 
-HM_HOME='home'
-HM_AWAY='away'
-HM_VACATION='vacation'
-HM_NIGHT='night'
+HM_HOME=1
+HM_AWAY=2
+HM_NIGHT=3
+HM_VACATION=4

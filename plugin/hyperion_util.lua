@@ -92,16 +92,20 @@ function house_mode()
    if house_mode_id_cache == -1 then
       return
    end
-   local hmode = tonumber(luup.variable_get(const.SID_HOUSEMODE, "HMode", house_mode_id_cache), 10)
+   return tonumber(luup.variable_get(const.SID_HOUSEMODE, "HMode", house_mode_id_cache), 10)
+end
 
-   if hmode == 1 then
-      return const.HM_HOME
-   elseif hmode == 2 then
-      return const.HM_AWAY
-   elseif hmode == 3 then
-      return const.HM_NIGHT
-   elseif hmode == 4 then
-      return const.HM_VACATION
+function hm_str(hm)
+   if hm == const.HM_HOME then
+      return "home"
+   elseif hm == const.HM_AWAY then
+      return "away"
+   elseif hm == const.HM_NIGHT then
+      return "night"
+   elseif hm == const.HM_VACATION then
+      return "vacation"
+   else
+      return "unknown"
    end
 end
 

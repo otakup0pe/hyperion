@@ -46,34 +46,42 @@ function rgb_only(device_id)
    end
 end
 
+function huesat_temp(device_id, temp)
+   local hue_start = 12000
+   local sat_start = 227
+   local hue_end = 10000
+   local sat_end = 235
+   local hue_diff = hue_start - hue_end
+   local sat_diff = sat_start - sat_end
+   local hue_scaled = hue_end + math.floor(hue_diff * (temp - 1000) / 500)
+   local sat_scaled = sat_end + math.floor(sat_diff * (temp - 1000) / 500)
+   hue_colour(device_id, hue_scaled, sat_scaled)
+end
+
 function hue_temp(device_id, p_temp)
-   if ( p_temp <= 2000 ) then
-      if is_color(device_id) or rgb_only(device_id) then
-         local hue_start = 12000
-         local sat_start = 227
-         local hue_end = 10000
-         local sat_end = 235
-         local hue_diff = hue_start - hue_end
-         local sat_diff = sat_start - sat_end
-         local hue_scaled = hue_end + math.floor(hue_diff * (p_temp - 1000) / 500)
-         local sat_scaled = sat_end + math.floor(sat_diff * (p_temp - 1000) / 500)
-         hue_colour(device_id, hue_scaled, sat_scaled)
-      else
-         hue_temp(device_id, 2001)
-      end
+   if rgb_only(device_id) then
+      huesat_temp(device_id, p_temp)
    else
-      -- kelvin to mired
-      local temp = math.floor(1000000 / p_temp)
-      local current = hue_val(device_id, "ct")
-      if type(current) == 'string' then
-         current = tonumber(current)
-      elseif type(current) == 'int' then
-         current = current
-      else
-         current = 0
+      if ( p_temp <= 2000 ) then
+         if is_color(device_id) then
+            huesat_temp(device_id, p_temp)
+         else
+            hue_temp(device_id, 2001)
       end
-      if temp ~= current then
-         luup.call_action(const.SID_HUEBULB,"SetColorTemperature", {ColorTemperature=temp, Transitiontime=10, action="SetColorTemperature", serviceId=const.SID_HUEBULB, DeviceNum=device_id}, device_id)
+      else
+         -- kelvin to mired
+         local temp = math.floor(1000000 / p_temp)
+         local current = hue_val(device_id, "ct")
+         if type(current) == 'string' then
+            current = tonumber(current)
+         elseif type(current) == 'int' then
+            current = current
+         else
+            current = 0
+         end
+         if temp ~= current then
+            luup.call_action(const.SID_HUEBULB,"SetColorTemperature", {ColorTemperature=temp, Transitiontime=10, action="SetColorTemperature", serviceId=const.SID_HUEBULB, DeviceNum=device_id}, device_id)
+         end
       end
    end
 end

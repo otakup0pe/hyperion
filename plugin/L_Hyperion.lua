@@ -9,16 +9,6 @@ function external_update(hyperion_id, update)
    local mode = hyperion_util.house_mode()
    if update and (mode == const.HM_HOME) then
       hyperion_ambience.update(hyperion_id)
-   elseif mode ~= const.HM_HOME then
-      if not ez_vera.switch_get(hyperion_id) then
-         log(hyperion_id, "debug", "This switch is disabled")
-      else
-         local lights = hyperion_util.device_list(hyperion_id, 'include_devices')
-         local cb = function(hyperion_id, device_id)
-            ez_vera.toggle(device_id, false)
-         end
-         dim_group(hyperion_id, lights, cb)
-      end
    end
 end
 
@@ -36,6 +26,21 @@ function external_watch(lul_device, lul_service, lul_variable, lul_value_old, lu
          for i, override_id in _G.ipairs(hyperion_util.device_list(maybe_hyperion_id, 'override_devices')) do
             if override_id == my_id then
                log(maybe_hyperion_id, 'info', "Updating due to override_device " .. override_id)
+               update = true
+            end
+         end
+         if lul_service == const.SID_HOUSEMODE then
+            if tonumber(lul_value_old) == const.HM_HOME then
+               if not ez_vera.switch_get(maybe_hyperion_id) then
+                  log(maybe_hyperion_id, "debug", "This switch is disabled")
+               else
+                  log(maybe_hyperion_id, "debug", "Turning off lights for house mode " .. lul_value_new)
+                  local lights = hyperion_util.device_list(maybe_hyperion_id, 'include_devices')
+                  for i, device_id in _G.ipairs(lights) do
+                     ez_vera.switch_actuate(device_id, false)
+                  end
+               end
+            elseif tonumber(lul_value_new) == const.HM_HOME then
                update = true
             end
          end
@@ -86,7 +91,7 @@ end
 function tick(lul_device)
    local hyperion_id = tonumber(lul_device)
    local mode = hyperion_util.house_mode()
-   log(hyperion_id, 'debug', "TICK " .. mode)
+   log(hyperion_id, 'debug', "TICK " .. hyperion_util.hm_str(mode))
    if mode == const.HM_HOME then
       hyperion_ambience.update(hyperion_id)
    end
