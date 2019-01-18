@@ -46,6 +46,99 @@ function rgb_only(device_id)
    end
 end
 
+function huesat_temp_new(device_id, temp)
+   -- rgb conversion from http://www.tannerhelland.com/4435/convert-temperature-rgb-algorithm-code/
+   local red, green, blue
+   local p_temp = temp / 100
+   if p_temp <= 66 then
+      red = 255
+   else
+      red = p_temp - 60
+      red = 329.698727446 * (math.pow(red,-0.1332047592))
+      if red < 0 then
+         red = 0
+      elseif red > 255 then
+         red = 255
+      end
+   end
+   if p_temp <= 66 then
+      green = 99.4708025861 * math.log(p_temp) - 161.1195681661
+   else
+      green = p_temp - 60
+      green = 288.1221695283 * (math.pow(green, -0.0755148492))
+   end
+   if green < 0 then
+      green = 0
+   elseif green > 255 then
+      green = 255
+   end
+   if p_temp >= 66 then
+      blue = 255
+   else
+      if p_temp <= 19 then
+         blue = 0
+      else
+         blue = p_temp - 10
+         blue = 138.5177312231 * math.log(p_temp) - 305.0447927307
+         if blue < 0 then
+            blue = 0
+         elseif blue > 255 then
+            blue = 255
+         end
+      end
+   end
+   -- hsl conversion from http://www.niwa.nu/2013/05/math-behind-colorspace-conversions-rgb-hsl/
+   local hue,sat,lum
+   local r_conv = red / 255
+   local g_conv = green / 255
+   local b_conv = blue / 255
+   local min, max
+   if r_conv < g_conv and r_conv < b_conv then
+      min = r_conv
+   elseif g_conv < r_conv and g_conv < b_conv then
+      min = g_conv
+   else
+      min = b_conv
+   end
+   if r_conv > g_conv and r_conv > b_conv then
+      max = r_conv
+   elseif g_conv > r_conv and g_conv > b_conv then
+      max = g_conv
+   else
+      max = b_conv
+   end
+   if min == max then
+      sat = 0
+   else
+      lum = math.ceil(((min + max) / 2) * 100)
+      if lum < 50 then
+         sat = (max-min)/(max+min)
+      else
+         sat = (max-min)/(2-max-min)
+      end
+      sat = math.floor(sat * 100)
+   end
+   if sat == 0 then
+      hue = 0
+   else
+      if max == r_conv then
+         hue = (g_conv-b_conv)/(max-min)
+      elseif max == g_conv then
+         hue = 2 + (b_conv-r_conv)/(max-min)
+      else
+         hue = 4 + (r_conv-g_conv)/(max-min)
+      end
+      hue = math.ceil(hue * 60)
+      if hue < 0 then
+         hue = hue + 360
+      end
+   end
+   luup.log("AAAAAA converted ct " .. temp .. " to " .. hue .. " " .. sat .. " (" .. red .. "," .. green .. "," .. blue ..")")
+   luup.log("AAAAAA convs " .. r_conv .. "," .. g_conv .. "," .. b_conv .. " min/max " .. max .. " " .. min)
+
+   hue_colour(device_id, hue, sat)
+end
+
 function huesat_temp(device_id, temp)
    local hue_start = 12000
    local sat_start = 227
@@ -60,7 +153,7 @@ end
 
 function hue_temp(device_id, p_temp)
    if rgb_only(device_id) then
-      huesat_temp(device_id, p_temp)
+      huesat_temp_new(device_id, p_temp)
    else
       if ( p_temp <= 2000 ) then
          if is_color(device_id) then
