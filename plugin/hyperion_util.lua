@@ -201,7 +201,7 @@ function active_room(hyperion_id)
    if table.getn(sensors) > 0 then
       return hyperion_util.any_tripped(sensors)
    else
-      return false
+      return true
    end
 end
 

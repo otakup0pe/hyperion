@@ -85,8 +85,8 @@ function night_ambience(hyperion_id, device_id)
    local temp = 0
    local sunrise = luup.sunrise()
    local past_sunrise = now - sunrise < 86400
-   local sunrise_hour = os.date("%H", sunrise)
-   local now_hour = os.date("%H", now)
+   local sunrise_hour = tonumber(os.date("%H", sunrise))
+   local now_hour = tonumber(os.date("%H", now))
    if night_hour == 0 then
       night_hour = 24
    end
@@ -95,35 +95,35 @@ function night_ambience(hyperion_id, device_id)
    end
    local past_night_time = tonumber(os.date("%H", now)) >= night_hour and tonumber(os.date("%m", now)) >= night_minute
    local past_midnight = past_sunrise and now_hour <= sunrise_hour
-   log(hyperion_id, "debug", "ambient_night past_sunrise:" .. tostring(past_sunrise) .. " past_night_time:" .. tostring(past_night_time) .. " past_midnight:" .. tostring(past_midnight))
+   log(hyperion_id, "debug", "Device #" .. device_id .. " now_hour:" .. now_hour .. " sunrise_hour:" .. sunrise_hour .. " past_midnight:" .. tostring(past_midnight))
+   log(hyperion_id, "debug", "Device #" .. device_id .. " past_sunrise:" .. tostring(past_sunrise) .. " past_night_time:" .. tostring(past_night_time))
    if ( past_sunrise and past_night_time ) or ( past_midnight ) then
       temp = night_temp;
    else
-      log(hyperion_id, "debug", "temps " .. evening_temp .. " " .. night_temp)
+      -- determine total distance between evening and night temperature
+      local temp_dist = evening_temp - night_temp
+      log(hyperion_id, "debug", "Device #" .. device_id .. " temps evening:" .. evening_temp .. " night:" .. night_temp .. " dist:" .. temp_dist)
       local night_secs =  os.time{day=os.date("%d", now),
                                   month=os.date("%m", now),
                                   year=os.date("%Y", now),
                                   hour=night_hour,
                                   min=night_minute,
                                   sec=00}
-      log(hyperion_id, "debug", "night_secs:" .. night_secs)
+      log(hyperion_id, "debug", "Device #" .. device_id .. " night_secs:" .. night_secs)
       -- tomorrow is close enough to today
       local l_sunset = luup.sunset()
       local sunset = l_sunset - 86400
-      log(hyperion_id, "debug", "sunset:" .. sunset .. " now:" .. now .. " l_sunset:" .. l_sunset)
+      log(hyperion_id, "debug", "Device #" .. device_id .. " sunset:" .. sunset .. " now:" .. now .. " l_sunset:" .. l_sunset)
       -- determine total seconds between sunset and bedtime
       local evening_secs = night_secs - sunset
-      log(hyperion_id, "debug", "evening_secs:" .. evening_secs)
-      -- determine total distance between evening and night temperature
-      local temp_dist = evening_temp - night_temp
-      log(hyperion_id, "debug", "temp_dist:" .. temp_dist)
+      log(hyperion_id, "debug", "Device #" .. device_id .. " evening_secs:" .. evening_secs)
       -- get appropriate temp
       local time_to_night = night_secs - now
-      log(hyperion_id, "debug", "ttn:" .. time_to_night)
+      log(hyperion_id, "debug", "Device #" .. device_id .. " ttn:" .. time_to_night)
       -- convert to what is expected
       temp = math.floor(night_temp + ( ( time_to_night / evening_secs ) * temp_dist ))
    end
-   log(hyperion_id, "debug", "setting temp to " .. temp)
+   log(hyperion_id, "debug", "Device #" .. device_id .. " setting temp to " .. temp)
    ez_vera.hue_temp(device_id, temp)
 end
 
@@ -134,7 +134,8 @@ function ambience_gate(hyperion_id)
    end
    local require_devices = hyperion_util.device_list(hyperion_id, 'require_devices')
    if (table.getn(require_devices) > 0) then
-      if not ez_vera.any_on(require_devices) and not hyperion_util.any_tripped(hyperion_util.get_sensors(hyperion_id, vera_constants.SID_SSENSOR)) then
+      local sensors = hyperion_util.get_sensors(hyperion_id, vera_constants.SID_SSENSOR)
+      if not ez_vera.any_on(require_devices) and (table.getn(sensors) > 0 and not hyperion_util.any_tripped(sensors)) then
          log(hyperion_id, 'debug', 'Ambience disabled via lack of required devices')
          return false
       end
