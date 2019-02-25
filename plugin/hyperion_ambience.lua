@@ -22,17 +22,20 @@ function dawn_ambience(hyperion_id, device_id)
                                  sec=00}
    local sunrise = luup.sunrise()
    local dim = 0
+   local dawn_percent = 0
    if luup.is_night() then
-      local dawn_percent = ( ( now - sunrise ) / ( sunrise - morning_secs ) ) * 100
-      dim = math.floor((dawn_percent /100) * hyperion_util.dim_get(hyperion_id))
+      dawn_percent = ( ( now - sunrise ) / ( sunrise - morning_secs ) ) * 100
+      log(hyperion_id, 'debug', "dawn_ambience is_night dawn_percent:" .. dawn_percent .. "(" .. dim .. ")")
       if ez_vera.is_hue(device_id) then
          ez_vera.hue_temp(device_id, evening_temp)
       end
    else
+      dawn_percent = ( ( sunrise - now  ) / ( sunrise - morning_secs ) ) * 100
       if ez_vera.is_hue(device_id) then
          ez_vera.hue_temp(device_id, day_temp)
       end
    end
+   dim = math.floor((dawn_percent / 100) * hyperion_util.dim_get(hyperion_id))   
    ez_vera.dim_actuate(device_id, dim)
 end
 
